@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>insta485</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <!-- Header section with navigation links -->
+    <header>
+        <h1><a href="{{ url_for('show_index') }}">insta485</a></h1>
+        <nav>
+            <ul>
+                <li><a href="{{ url_for('explore') }}">explore</a></li>
+                <li><a href="{{ url_for('show_user', user_url_slug=logname) }}">{{ logname }}</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <!-- Section for displaying posts -->
+    <section>
+        {% for post in posts %}
+        <article>
+            <!-- Link to post detail page with human-readable timestamp -->
+            <p>
+                <a href="{{ url_for('show_post', postid_url_slug=post.postid) }}">
+                    {{ post.time }}
+                </a>
+            </p>
+
+            <!-- Link to the post owner's profile page and display their image -->
+            <p>
+                <a href="{{ url_for('show_user', user_url_slug=post.owner) }}">{{ post.owner }}</a>
+                <a href="{{ url_for('show_user', user_url_slug=post.owner) }}">
+                    <img src="{{ url_for('upload_file', filename=post.profile_pic) }}" alt="{{ post.owner }}'s profile image" class="profile-pic">
+                </a>
+            </p>
+
+            <!-- Post image -->
+            <img src="{{ url_for('upload_file', filename=post.post_file) }}" alt="Post {{ post.postid }}" class="post-pic">
+
+            <!-- Number of likes with correct English grammar -->
+            <p>{{ post.likes }} {{ 'like' if post.likes == 1 else 'likes' }}</p>
+
+            <!-- Like/Unlike button -->
+            {% if post.liked_by_user %}
+            <form action="{{ url_for('handle_likes') }}?target={{ request.path }}" method="post" enctype="multipart/form-data">
+                <input type="hidden" name="operation" value="unlike"/>
+                <input type="hidden" name="postid" value="{{ post.postid }}"/>
+                <input type="submit" name="unlike" value="unlike"/>
+            </form>
+            {% else %}
+            <form action="{{ url_for('handle_likes') }}?target={{ request.path }}" method="post" enctype="multipart/form-data">
+                <input type="hidden" name="operation" value="like"/>
+                <input type="hidden" name="postid" value="{{ post.postid }}"/>
+                <input type="submit" name="like" value="like"/>
+            </form>
+            {% endif %}
+
+            <!-- Display comments -->
+            <section>
+                {% for comment in post.comments %}
+                <p>
+                    <a href="{{ url_for('show_user', user_url_slug=comment.owner) }}">{{ comment.owner }}</a> 
+                    {{ comment.text }}
+                </p>
+                {% endfor %}
+            </section>
+
+            <!-- Comment submission form -->
+            <form action="{{ url_for('handle_comments') }}?target={{ request.path }}" method="post" enctype="multipart/form-data">
+                <input type="hidden" name="operation" value="create"/>
+                <input type="hidden" name="postid" value="{{ post.postid }}"/>
+                <input type="text" name="text" required placeholder="Add a comment"/>
+                <input type="submit" name ="comment" value="comment"/>
+            </form>
+        </article>
+        {% endfor %}
+    </section>
+</body>
+</html>

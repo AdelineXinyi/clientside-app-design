@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>insta485</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <!-- Header section with navigation links -->
+    <header>
+        <h1><a href="{{ url_for('show_index') }}">insta485</a></h1>
+        <nav>
+            <ul>
+                <!-- ADD IF STATEMENT LOGIN -->
+                <li><a href="{{ url_for('explore') }}">explore</a></li>
+                <li><a href="{{ url_for('show_user', user_url_slug=logname) }}">{{ logname }}</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <h3>Discover People</h3>
+    <ul>
+        {% for user in users %}
+        <li>
+            <img src="{{ url_for('upload_file', filename=user['filename']) }}" alt="Profile picture of {{ user['username'] }}" class="icon">
+            <a href="{{ url_for('show_user', user_url_slug=user['username']) }}">{{ user['username'] }}</a>
+
+            <!-- Follow form -->
+            <form action="{{ url_for('handle_follows') }}?target={{ request.path }}" method="post" enctype="multipart/form-data">
+                <input type="submit" name="follow" value="follow"/>
+                <input type="hidden" name="username" value="{{ user['username'] }}"/>
+                <input type="hidden" name="operation" value="follow"/>
+            </form>
+        </li>
+        {% endfor %}
+    </ul>
+</body>
+</html>

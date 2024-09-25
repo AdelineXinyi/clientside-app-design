@@ -1,0 +1,19 @@
+#!/bin/bash
+
+# Stop on errors and print commands
+set -Eeuo pipefail
+set -e
+set -x
+
+# Run code style checks
+pycodestyle insta485
+
+# Run docstring style checks
+pydocstyle insta485
+
+# Run pylint checks
+pylint insta485
+
+# Run all unit tests using pytest
+pytest -v tests
+

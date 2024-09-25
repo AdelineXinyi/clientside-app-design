@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>insta485</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <!-- Header section with navigation links -->
+    <header>
+        <h1><a href="{{ url_for('show_index') }}">insta485</a></h1>
+        <nav>
+            <ul>
+                <li><a href="{{ url_for('explore') }}">explore</a></li>
+                <li><a href="{{ url_for('show_user', user_url_slug=logname) }}">{{ logname }}</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <h3>{{ username }}</h3>
+    
+    {% if logname != username %}
+        {% if lognameFollowsUsername %}
+            <p>following</p>
+            <!-- Unfollow form -->
+            <form action="{{ url_for('handle_follows') }}?target={{ request.path }}" method="post" enctype="multipart/form-data">
+                <input type="submit" name="unfollow" value="unfollow"/>
+                <input type="hidden" name="username" value="{{ username }}"/>
+                <input type="hidden" name="operation" value="unfollow"/>
+            </form>
+        {% else %}
+            <p>not following</p>
+            <!-- Follow form -->
+            <form action="{{ url_for('handle_follows') }}?target={{ request.path }}" method="post" enctype="multipart/form-data">
+                <input type="submit" name="follow" value="follow"/>
+                <input type="hidden" name="username" value="{{ username }}"/>
+                <input type="hidden" name="operation" value="follow"/>
+            </form>
+        {% endif %}
+    {% endif %}
+    
+    <p>{{ totalPosts }} {{ 'post' if totalPosts == 1 else 'posts' }}</p>
+    <a href="{{ url_for('show_followers', user_url_slug=username) }}">{{ followers }} {{ 'follower' if followers == 1 else 'followers' }}</a>
+    <a href="{{ url_for('show_following', user_url_slug=username) }}">{{ following }} following</a>
+    <p>{{ fullname }}</p>
+
+    {% if posts %}
+        {% for post in posts %}
+            <a href="{{ url_for('show_post', postid_url_slug=post.postid) }}">
+                {{ post.time }}
+                <img src="{{ url_for('upload_file', filename=post.filename) }}" alt="{{ username }} image {{ post.postid }}">
+            </a>
+        {% endfor %}
+    {% else %}
+        <p>No posts yet.</p>
+    {% endif %}
+
+    {% if logname == username %}
+        <!-- Link to edit account -->
+        <a href="{{ url_for('edit') }}">Edit profile</a>
+
+        <!-- Logout form -->
+        <form action="{{ url_for('handle_logout') }}" method="post" enctype="multipart/form-data">
+            <input type="submit" name="logout" value="Logout"/>
+        </form>
+
+        <!-- File upload form for new post -->
+        <form action="{{ url_for('handle_post') }}?target={{ request.path }}" method="post" enctype="multipart/form-data">
+            <input type="file" name="file" accept="image/*" required/>
+            <input type="submit" name="create_post" value="upload new post"/>
+            <input type="hidden" name="operation" value="create"/>
+        </form>
+    {% endif %}
+</body>
+</html>
