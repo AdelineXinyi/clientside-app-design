@@ -5,7 +5,6 @@ import insta485.model
 
 @insta485.app.route('/api/v1/likes/', methods=['POST'])
 def add_like():
-    print("hello")
     username = flask.request.authorization['username']
     password = flask.request.authorization['password']
     if not username or not password:
