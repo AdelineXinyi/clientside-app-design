@@ -1,7 +1,7 @@
 """REST API for posts."""
 import flask
 import insta485
-import arrow
+import insta485.model
 
 @insta485.app.route('/api/v1/', methods=['GET'])
 def get_service():
@@ -16,11 +16,24 @@ def get_service():
 
 @insta485.app.route('/api/v1/posts/<int:postid_url_slug>/',methods=['GET'])
 def get_post(postid_url_slug):
-    username = flask.request.authorization['username']
-    password = flask.request.authorization['password']
-    if not username or not password:
-        return flask.jsonify({"error": "Unauthorized"}), 403
+    auth = flask.request.authorization
+    if not auth or 'username' not in auth or 'password' not in auth:
+        return flask.jsonify({
+            "message": "Authentication required",
+            "status_code": 403
+        }), 403
+
+    username = auth['username']
+   # password = auth['password']
     connection = insta485.model.get_db()
+    # cursor = connection.cursor()
+    # cursor.execute('SELECT password FROM users WHERE username = ?', (username,))
+    # result = cursor.fetchone()
+    # if not username or not password or password!=result:
+    #     return flask.jsonify({
+    #         "message": "Authentication required",
+    #         "status_code": 403
+    #     }), 403
     post = connection.execute(
         "SELECT owner, filename, created FROM posts WHERE postid = ?",
         (postid_url_slug,)
@@ -96,40 +109,78 @@ def get_post(postid_url_slug):
 
 @insta485.app.route('/api/v1/posts/', methods=['GET'])
 def get_posts():
-    username = flask.request.authorization['username']
-    password = flask.request.authorization['password']
-    if not username or not password:
-        return flask.jsonify({"error": "Unauthorized"}), 403
+    username = flask.session.get('username')
+    if not username:
+        auth = flask.request.authorization
+        if not auth or 'username' not in auth or 'password' not in auth:
+            return flask.jsonify({
+            "message": "Authentication required",
+            "status_code": 403
+        }), 403
+
+        username = auth['username']
+        password = auth['password']
     connection = insta485.model.get_db()
+    # cursor = connection.cursor()
+    # cursor.execute('SELECT password FROM users WHERE username = ?', (username,))
+    # result = cursor.fetchone()
+    # check password match (salt+hash)
+    #     return flask.jsonify({
+    #         "message": "Authentication required",
+    #         "status_code": 403
+    #     }), 403
     followed_users = connection.execute(
         "SELECT username2 FROM following WHERE username1 = ?",
-        (username,)
-    ).fetchall()
+        (username,)).fetchall()
     followed_usernames = [row['username2'] for row in followed_users]
     followed_usernames.append(username) 
+
+    postid_lte = flask.request.args.get('postid_lte', type=int)
+    size = flask.request.args.get('size', default=10, type=int)  
+    page = flask.request.args.get('page', default=0, type=int)
+    if size <= 0:
+        return flask.jsonify({"message": "size must be a positive integer",
+                              "status_code": 400}), 400
+    if page < 0:
+        return flask.jsonify({"message": "page must be a non-negative integer",
+                               "status_code": 400}), 400
+    if postid_lte is None:
+        recent_post = connection.execute(
+            "SELECT postid FROM posts WHERE owner IN ({}) ORDER BY postid DESC LIMIT 1".format(
+                ', '.join(['?'] * len(followed_usernames))),followed_usernames
+        ).fetchone()
+        postid_lte = recent_post['postid'] if recent_post else 0
+    #FIX:offset
+    offset = page * size
+    placeholders = ', '.join(['?'] * len(followed_usernames))
     query = f"""
         SELECT postid, filename, owner, created 
         FROM posts 
-        WHERE owner IN ({','.join(['?'] * len(followed_usernames))})
-        ORDER BY postid DESC 
-        LIMIT 10
+        WHERE owner IN ({placeholders}) 
     """
-    posts = connection.execute(query, followed_usernames).fetchall()
-    results = []
-    for post in posts:
-        results.append({
-            "postid": post['postid'],
-            "url": f"/api/v1/posts/{post['postid']}/"
-        })
+    query += " AND postid <= ?"
+    query += f" ORDER BY postid DESC LIMIT ? OFFSET ?"
+    params = followed_usernames 
+    params.append(postid_lte)
+    params += [size, offset]
+    posts = connection.execute(query, params).fetchall()
+
+    results = [{
+        "postid": post['postid'],  
+        "url": f"/api/v1/posts/{post['postid']}/"
+    } for post in posts]
 
     # Check if there's a next page
     next_url = ""
-    if len(posts) == 10:
-        next_url = flask.url_for('get_posts', username=username, _external=True)  # Assuming pagination
-
+    if len(posts) == size:
+        next_url = flask.url_for('get_posts', size=size,
+                                page=page + 1, postid_lte=postid_lte)
+        
+    current_url = flask.request.path
+    if flask.request.query_string:
+        current_url += f"?{flask.request.query_string.decode()}"
     return flask.jsonify({
         "next": next_url,
         "results": results,
-        "url": flask.request.path
+        "url": current_url
     }), 200
-
