@@ -1,24 +1,31 @@
 import flask
 import insta485
 import insta485.model
+import hashlib
 
 
 @insta485.app.route('/api/v1/comments/', methods=['POST'])
 def add_comment():
-    username = flask.request.authorization['username']
-    password = flask.request.authorization['password']
+    username = flask.session.get('username')
+    connection = insta485.model.get_db()
+    if not username:
+        auth = flask.request.authorization
+        if  insta485.model.hash_pass()==False:
+            return flask.jsonify({
+            "message": "Authentication required",
+            "status_code": 403
+        }), 403
+        username = auth['username']
     postid = flask.request.args.get('postid')
     text = flask.request.json.get('text')
 
     if not postid:
         return flask.jsonify({"error": "postid and text are required"}), 404
 
-    connection = insta485.model.get_db()
-    cursor = connection.cursor()
-
     # Insert the comment into the database
-    cursor.execute('INSERT INTO comments (postid, text, owner) VALUES (?, ?, ?)',
+    connection.execute('INSERT INTO comments (postid, text, owner) VALUES (?, ?, ?)',
                    (postid, text, username))  
+    cursor=connection.cursor()
     comment_id = cursor.lastrowid
     connection.commit()
 
@@ -33,9 +40,16 @@ def add_comment():
 
 @insta485.app.route('/api/v1/comments/<int:commentid>/', methods=['DELETE'])
 def delete_comment(commentid):
-    username = flask.request.authorization['username']
-    password = flask.request.authorization['password']
+    username = flask.session.get('username')
     connection = insta485.model.get_db()
+    if not username:
+        auth = flask.request.authorization
+        if  insta485.model.hash_pass()==False:
+            return flask.jsonify({
+            "message": "Authentication required",
+            "status_code": 403
+        }), 403
+        username = auth['username']
     comment = connection.execute('SELECT * FROM comments WHERE commentid = ?',
                                 (commentid,)).fetchone()
     if not comment:

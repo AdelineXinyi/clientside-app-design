@@ -2,6 +2,7 @@
 import flask
 import insta485
 import insta485.model
+import hashlib
 
 @insta485.app.route('/api/v1/', methods=['GET'])
 def get_service():
@@ -16,34 +17,21 @@ def get_service():
 
 @insta485.app.route('/api/v1/posts/<int:postid_url_slug>/',methods=['GET'])
 def get_post(postid_url_slug):
-    auth = flask.request.authorization
-    if not auth or 'username' not in auth or 'password' not in auth:
-        return flask.jsonify({
+    username = flask.session.get('username')
+    if not username:
+        auth = flask.request.authorization
+        if  insta485.model.hash_pass()==False:
+            return flask.jsonify({
             "message": "Authentication required",
             "status_code": 403
         }), 403
-
-    username = auth['username']
-   # password = auth['password']
+        username = auth['username']
     connection = insta485.model.get_db()
-    # cursor = connection.cursor()
-    # cursor.execute('SELECT password FROM users WHERE username = ?', (username,))
-    # result = cursor.fetchone()
-    # if not username or not password or password!=result:
-    #     return flask.jsonify({
-    #         "message": "Authentication required",
-    #         "status_code": 403
-    #     }), 403
     post = connection.execute(
         "SELECT owner, filename, created FROM posts WHERE postid = ?",
-        (postid_url_slug,)
-    ).fetchone()
-
-    # Return 404 if post not found
+        (postid_url_slug,)).fetchone()
     if post is None:
         return flask.jsonify({"message": "Not Found", "status_code": 404}), 404
-
-    # Fetch comments
     comments_query = """
         SELECT commentid, owner, text 
         FROM comments 
@@ -110,25 +98,15 @@ def get_post(postid_url_slug):
 @insta485.app.route('/api/v1/posts/', methods=['GET'])
 def get_posts():
     username = flask.session.get('username')
+    connection = insta485.model.get_db()
     if not username:
         auth = flask.request.authorization
-        if not auth or 'username' not in auth or 'password' not in auth:
+        if  insta485.model.hash_pass()==False:
             return flask.jsonify({
             "message": "Authentication required",
             "status_code": 403
         }), 403
-
         username = auth['username']
-        password = auth['password']
-    connection = insta485.model.get_db()
-    # cursor = connection.cursor()
-    # cursor.execute('SELECT password FROM users WHERE username = ?', (username,))
-    # result = cursor.fetchone()
-    # check password match (salt+hash)
-    #     return flask.jsonify({
-    #         "message": "Authentication required",
-    #         "status_code": 403
-    #     }), 403
     followed_users = connection.execute(
         "SELECT username2 FROM following WHERE username1 = ?",
         (username,)).fetchall()
