@@ -71,52 +71,15 @@ export default function Post({ url }) {
       <img src={imgUrl} alt="post_image" />
       <p>{owner}</p>
             <p>
-                <a href={postShowUrl}>{created}</a>
+                <a href={postShowUrl}>{formattedCreatedTime()}</a>
                 <a href={ownerShowUrl}>{owner}</a>
                 <a href={ownerShowUrl}>
-                    <img src={imgUrl} alt={`${owner}s profile image`} className="profile-pic"/>
+                    <img src={ownerImgUrl} alt={`${owner}s profile image`} className="profile-pic"/>
                 </a>
             </p>
             <img src={postShowUrl} alt={`Post ${postid}`} className="post-pic"></img>
             <Likes postid={postid} initialLikes={likes} />
-            // this is a work in progress
-            // not actual jsx, this is html template copied over
-            // so i knew what still needed to be rendered
-            // this logic should all go in comments
-            // need to put infinite scroll after comments logic too 
-            <section>
-                {% for comment in comments %}
-                <div>
-                    <p>
-                        <a href="{{ url_for('show_user', user_url_slug=comment.owner) }}">{{ comment.owner }}</a> 
-                        {{ comment.text }}
-                    </p>
-                    {% if comment.owner == logname %}
-                    <form action="{{ url_for('handle_comments') }}?target={{ request.path }}" method="post" enctype="multipart/form-data">
-                        <input type="hidden" name="operation" value="delete"/>
-                        <input type="hidden" name="commentid" value="{{ comment.commentid }}"/>
-                        <input type="submit" name="uncomment" value="delete"/>
-                    </form>
-                    {% endif %}
-                </div>
-                {% endfor %}
-            </section>
-
-            <!-- Comment submission form -->
-            <form action="{{ url_for('handle_comments') }}?target={{ request.path }}" method="post" enctype="multipart/form-data">
-                <input type="hidden" name="operation" value="create"/>
-                <input type="hidden" name="postid" value="{{ postid }}"/>
-                <input type="text" name="text" required placeholder="Add a comment"/>
-                <input type="submit" name="comment" value="comment"/>
-            </form>
-
-            {% if username == logname %}
-            <form action="{{ url_for('handle_post') }}?target={{ request.path }}" method="post" enctype="multipart/form-data">
-                <input type="hidden" name="operation" value="delete"/>
-                <input type="hidden" name="postid" value="{{ postid }}"/>
-                <input type="submit" name="delete" value="delete this post"/>
-            </form>
-            {% endif %}
+            <Comments postid={postid} initialComments={comments} />
     </div>
   );
 }
