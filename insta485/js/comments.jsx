@@ -21,8 +21,8 @@ export default function Comments({ postid, initialComments }) {
 
   const handleSubmit = (event) => {
     if (event.key === 'Enter' && newCommentText.trim()) {
-      event.preventDefault();
-      const makeCommentUrl = `api/v1/comments/?postid=${postid}`;
+      event.preventDefault(); // Prevent default behavior for Enter key
+      const makeCommentUrl = `/api/v1/comments/?postid=${postid}`;
       fetch(makeCommentUrl, {
         credentials: 'same-origin',
         method: 'POST',
@@ -67,20 +67,22 @@ export default function Comments({ postid, initialComments }) {
           </div>
         ))}
       </section>
-      <input
-        type="text"
-        required
-        placeholder="Add a comment"
-        value={newCommentText}
-        onChange={(e) => setNewCommentText(e.target.value)}
-        onKeyDown={handleSubmit}
-      />
+      {/* Wrap input in a form element */}
+      <form data-testid="comment-form">
+        <input
+          type="text"
+          required
+          value={newCommentText}
+          onChange={(e) => setNewCommentText(e.target.value)}
+          onKeyDown={handleSubmit} // Ensure the function is called on keydown
+        />
+      </form>
     </div>
   );
 }
 
 Comments.propTypes = {
-  postid: PropTypes.string.isRequired,
+  postid: PropTypes.number.isRequired,
   initialComments: PropTypes.arrayOf(PropTypes.shape({
     commentid: PropTypes.number.isRequired,
     lognameOwnsThis: PropTypes.bool.isRequired,

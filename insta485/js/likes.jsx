@@ -16,14 +16,12 @@ export default function Likes({ postid, initialLikes }) {
         return response.json();
       })
       .then((data) => {
-        if (!likes.lognameLikesThis) {
           setLikes((prevLikes) => ({
             ...prevLikes,
-            numLikes: likes.numLikes + 1,
+            numLikes: prevLikes.numLikes + 1,
             lognameLikesThis: true,
             url: data.url,
           }));
-        }
       })
       .catch((error) => console.log(error));
   };
@@ -35,14 +33,12 @@ export default function Likes({ postid, initialLikes }) {
         if (!response.ok) throw Error(response.statusText);
       })
       .then(() => {
-        if (likes.lognameLikesThis) {
           setLikes((prevLikes) => ({
             ...prevLikes,
             numLikes: prevLikes.numLikes - 1,
             lognameLikesThis: false,
             url: null,
           }));
-        }
       })
       .catch((error) => console.log(error));
   };
@@ -64,7 +60,7 @@ export default function Likes({ postid, initialLikes }) {
 }
 
 Likes.propTypes = {
-  postid: PropTypes.string.isRequired,
+  postid: PropTypes.number.isRequired,
   initialLikes: PropTypes.shape({
     numLikes: PropTypes.number.isRequired,
     lognameLikesThis: PropTypes.bool.isRequired,

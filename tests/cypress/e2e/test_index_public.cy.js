@@ -16,6 +16,7 @@ function loadFeed() {
 
   // Verify links. Each call to cy.get() is an implicit assertion that an element matching
   // the selector exists.
+ 
   cy.get("a[href='/posts/1/']");
   cy.get("a[href='/posts/2/']");
   cy.get("a[href='/posts/3/']");

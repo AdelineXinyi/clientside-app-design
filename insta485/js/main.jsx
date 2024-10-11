@@ -9,7 +9,6 @@ const root = createRoot(document.getElementById("reactEntry"));
 // Insert the post component into the DOM
 root.render(
   <StrictMode>
-    // fix this to be all posts ?? maybe
     <Post url="/api/v1/posts/1/" />
   </StrictMode>
 );
