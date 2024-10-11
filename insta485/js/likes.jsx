@@ -51,7 +51,9 @@ export default function Likes({ postid, initialLikes }) {
 
   return (
     <div onDoubleClick={handleDoubleClick}>
-      <button onClick={likes.lognameLikesThis ? handleUnlike : handleLike}>
+      <button 
+        data-testid="like-unlike-button"
+        onClick={likes.lognameLikesThis ? handleUnlike : handleLike}>
         {likes.lognameLikesThis ? 'Unlike' : 'Like'}
       </button>
       <p>{likes.numLikes} {likes.numLikes === 1 ? 'Like' : 'Likes'}</p>

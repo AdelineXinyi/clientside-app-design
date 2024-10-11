@@ -418,15 +418,17 @@ function Comments(_ref) {
     }
   };
   return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_2___default().createElement("div", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_2___default().createElement("section", null, comments.map(function (comment) {
-    return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_2___default().createElement("div", {
-      key: comment.commentid
-    }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_2___default().createElement("p", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_2___default().createElement("a", {
+    return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_2___default().createElement("form", {
+      key: comment.commentid,
+      "data-testid": "comment-text"
+    }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_2___default().createElement("div", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_2___default().createElement("p", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_2___default().createElement("a", {
       href: comment.ownerShowUrl
     }, comment.owner), ": ", comment.text), comment.lognameOwnsThis && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_2___default().createElement("button", {
+      "data-testid": "delete-comment-button",
       onClick: function onClick() {
         return handleDelete(comment.commentid);
       }
-    }, "Delete Comment"));
+    }, "Delete Comment")));
   })), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_2___default().createElement("form", {
     "data-testid": "comment-form"
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_2___default().createElement("input", {
@@ -533,6 +535,7 @@ function Likes(_ref) {
   return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_2___default().createElement("div", {
     onDoubleClick: handleDoubleClick
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_2___default().createElement("button", {
+    "data-testid": "like-unlike-button",
     onClick: likes.lognameLikesThis ? handleUnlike : handleLike
   }, likes.lognameLikesThis ? 'Unlike' : 'Like'), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_2___default().createElement("p", null, likes.numLikes, " ", likes.numLikes === 1 ? 'Like' : 'Likes'));
 }

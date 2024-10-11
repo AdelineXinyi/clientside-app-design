@@ -57,17 +57,24 @@ export default function Comments({ postid, initialComments }) {
     <div>
       <section>
         {comments.map((comment) => (
-          <div key={comment.commentid}>
-            <p>
-              <a href={comment.ownerShowUrl}>{comment.owner}</a>: {comment.text}
-            </p>
-            {comment.lognameOwnsThis && (
-              <button onClick={() => handleDelete(comment.commentid)}>Delete Comment</button>
-            )}
-          </div>
+          <form key={comment.commentid} data-testid="comment-text">
+            <div>
+              <p>
+                <a href={comment.ownerShowUrl}>{comment.owner}</a>: {comment.text}
+              </p>
+              {comment.lognameOwnsThis && (
+                <button 
+                data-testid="delete-comment-button"
+                onClick={() => handleDelete(comment.commentid)}
+                >
+                  Delete Comment
+                </button>
+              )}
+            </div>
+          </form>
         ))}
       </section>
-      {/* Wrap input in a form element */}
+      {/* Form for adding new comments */}
       <form data-testid="comment-form">
         <input
           type="text"
