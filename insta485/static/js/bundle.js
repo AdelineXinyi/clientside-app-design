@@ -683,8 +683,14 @@ function Post(_ref) {
               detailedPosts = _context2.sent;
               // Append new detailed posts to the postData
               setPostData(function (prevPostData) {
+                var existingPostIds = new Set(prevPostData.posts.map(function (post) {
+                  return post.postId;
+                }));
+                var newPosts = detailedPosts.filter(function (post) {
+                  return !existingPostIds.has(post.postId);
+                });
                 return {
-                  posts: [].concat((0,_babel_runtime_helpers_toConsumableArray__WEBPACK_IMPORTED_MODULE_0__["default"])(prevPostData.posts), (0,_babel_runtime_helpers_toConsumableArray__WEBPACK_IMPORTED_MODULE_0__["default"])(detailedPosts)) // Append new detailed posts
+                  posts: [].concat((0,_babel_runtime_helpers_toConsumableArray__WEBPACK_IMPORTED_MODULE_0__["default"])(prevPostData.posts), (0,_babel_runtime_helpers_toConsumableArray__WEBPACK_IMPORTED_MODULE_0__["default"])(newPosts)) // Append only unique new posts
                 };
               });
 

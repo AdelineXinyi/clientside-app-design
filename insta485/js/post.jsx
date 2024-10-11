@@ -48,9 +48,14 @@ export default function Post({ url }) {
         const detailedPosts = await Promise.all(detailedPostsPromises);
 
         // Append new detailed posts to the postData
-        setPostData((prevPostData) => ({
-          posts: [...prevPostData.posts, ...detailedPosts], // Append new detailed posts
-        }));
+        setPostData((prevPostData) => {
+          const existingPostIds = new Set(prevPostData.posts.map(post => post.postId));
+          const newPosts = detailedPosts.filter(post => !existingPostIds.has(post.postId));
+        
+          return {
+            posts: [...prevPostData.posts, ...newPosts], // Append only unique new posts
+          };
+        });
 
         // Update nextUrl state
         setNextUrl(data.next); // Set nextUrl for pagination
