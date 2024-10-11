@@ -597,216 +597,137 @@ function Post(_ref) {
     loading = _useState2[0],
     setLoading = _useState2[1];
   var _useState3 = (0,react__WEBPACK_IMPORTED_MODULE_4__.useState)({
-      imgUrl: "",
-      owner: "",
-      ownerImgUrl: "",
-      comments: [],
-      likes: {
-        numLikes: 0,
-        lognameLikesThis: false,
-        url: ""
-      },
-      created: "",
-      ownerShowUrl: "",
-      postShowUrl: "",
-      postId: 1
+      posts: []
     }),
     _useState4 = (0,_babel_runtime_helpers_slicedToArray__WEBPACK_IMPORTED_MODULE_2__["default"])(_useState3, 2),
     postData = _useState4[0],
     setPostData = _useState4[1];
-  var _useState5 = (0,react__WEBPACK_IMPORTED_MODULE_4__.useState)({
-      next: "",
-      results: [],
-      url: ""
-    }),
+  var _useState5 = (0,react__WEBPACK_IMPORTED_MODULE_4__.useState)(url),
     _useState6 = (0,_babel_runtime_helpers_slicedToArray__WEBPACK_IMPORTED_MODULE_2__["default"])(_useState5, 2),
-    pagenation = _useState6[0],
-    setPagenation = _useState6[1];
+    nextUrl = _useState6[0],
+    setNextUrl = _useState6[1]; // Initialize nextUrl with the provided URL
 
   // Fetch posts
-  // 1. fetch api/v1/posts/
-  // 2. 10 posts are put in the results (with urls and post ids ())
-  //      - if less, next will be empty
-  //      - if more, next will have the next page
-  // 3. fetch api/v1/posts/<post_id> for each post id (full url)
-  // 4. 
   (0,react__WEBPACK_IMPORTED_MODULE_4__.useEffect)(function () {
-    var ignoreStaleRequest = false;
-    var fetchPostData = /*#__PURE__*/function () {
-      var _ref2 = (0,_babel_runtime_helpers_asyncToGenerator__WEBPACK_IMPORTED_MODULE_1__["default"])(/*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_3___default().mark(function _callee() {
-        var response, data;
-        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_3___default().wrap(function _callee$(_context) {
-          while (1) switch (_context.prev = _context.next) {
+    var fetchPosts = /*#__PURE__*/function () {
+      var _ref2 = (0,_babel_runtime_helpers_asyncToGenerator__WEBPACK_IMPORTED_MODULE_1__["default"])(/*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_3___default().mark(function _callee2() {
+        var response, data, detailedPostsPromises, detailedPosts;
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_3___default().wrap(function _callee2$(_context2) {
+          while (1) switch (_context2.prev = _context2.next) {
             case 0:
-              _context.prev = 0;
-              _context.next = 3;
-              return fetch(url, {
+              _context2.prev = 0;
+              setLoading(true); // Set loading to true at the start
+              _context2.next = 4;
+              return fetch(nextUrl, {
                 credentials: "same-origin"
               });
-            case 3:
-              response = _context.sent;
+            case 4:
+              response = _context2.sent;
               if (response.ok) {
-                _context.next = 6;
+                _context2.next = 7;
                 break;
               }
               throw new Error(response.statusText);
-            case 6:
-              _context.next = 8;
+            case 7:
+              _context2.next = 9;
               return response.json();
-            case 8:
-              data = _context.sent;
-              if (!ignoreStaleRequest) {
-                setPostData(function (prevPostData) {
-                  return {
-                    posts: [{
-                      imgUrl: data.imgUrl,
-                      owner: data.owner,
-                      ownerImgUrl: data.ownerImgUrl,
-                      comments: data.comments,
-                      likes: data.likes,
-                      created: data.created,
-                      ownerShowUrl: data.ownerShowUrl,
-                      postShowUrl: data.postShowUrl,
-                      postId: data.postid
-                    }].concat((0,_babel_runtime_helpers_toConsumableArray__WEBPACK_IMPORTED_MODULE_0__["default"])(prevPostData.posts)),
-                    nextUrl: data.nextUrl,
-                    hasMore: !!data.nextUrl
-                  };
-                });
-                setLoading(false); // Data has been loaded
-              }
-              _context.next = 15;
+            case 9:
+              data = _context2.sent;
+              // Array to hold detailed post data
+              detailedPostsPromises = data.results.map(/*#__PURE__*/function () {
+                var _ref3 = (0,_babel_runtime_helpers_asyncToGenerator__WEBPACK_IMPORTED_MODULE_1__["default"])(/*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_3___default().mark(function _callee(result) {
+                  var postResponse, postData;
+                  return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_3___default().wrap(function _callee$(_context) {
+                    while (1) switch (_context.prev = _context.next) {
+                      case 0:
+                        _context.next = 2;
+                        return fetch(result.url, {
+                          credentials: "same-origin"
+                        });
+                      case 2:
+                        postResponse = _context.sent;
+                        if (postResponse.ok) {
+                          _context.next = 5;
+                          break;
+                        }
+                        throw new Error(postResponse.statusText);
+                      case 5:
+                        _context.next = 7;
+                        return postResponse.json();
+                      case 7:
+                        postData = _context.sent;
+                        return _context.abrupt("return", {
+                          imgUrl: postData.imgUrl,
+                          owner: postData.owner,
+                          ownerImgUrl: postData.ownerImgUrl,
+                          comments: postData.comments,
+                          likes: postData.likes,
+                          created: postData.created,
+                          ownerShowUrl: postData.ownerShowUrl,
+                          postShowUrl: postData.postShowUrl,
+                          postId: postData.postid
+                        });
+                      case 9:
+                      case "end":
+                        return _context.stop();
+                    }
+                  }, _callee);
+                }));
+                return function (_x) {
+                  return _ref3.apply(this, arguments);
+                };
+              }()); // Resolve all the promises to get detailed post data
+              _context2.next = 13;
+              return Promise.all(detailedPostsPromises);
+            case 13:
+              detailedPosts = _context2.sent;
+              // Append new detailed posts to the postData
+              setPostData(function (prevPostData) {
+                return {
+                  posts: [].concat((0,_babel_runtime_helpers_toConsumableArray__WEBPACK_IMPORTED_MODULE_0__["default"])(prevPostData.posts), (0,_babel_runtime_helpers_toConsumableArray__WEBPACK_IMPORTED_MODULE_0__["default"])(detailedPosts)) // Append new detailed posts
+                };
+              });
+
+              // Update nextUrl state
+              setNextUrl(data.next); // Set nextUrl for pagination
+              setLoading(false); // Set loading to false after fetching
+              _context2.next = 23;
               break;
-            case 12:
-              _context.prev = 12;
-              _context.t0 = _context["catch"](0);
-              console.error("Error fetching post data:", _context.t0);
-            case 15:
+            case 19:
+              _context2.prev = 19;
+              _context2.t0 = _context2["catch"](0);
+              console.error("Error fetching posts:", _context2.t0);
+              setLoading(false); // Ensure loading is set to false on error
+            case 23:
             case "end":
-              return _context.stop();
+              return _context2.stop();
           }
-        }, _callee, null, [[0, 12]]);
+        }, _callee2, null, [[0, 19]]);
       }));
-      return function fetchPostData() {
+      return function fetchPosts() {
         return _ref2.apply(this, arguments);
       };
     }();
-    fetchPostData();
-    return function () {
-      ignoreStaleRequest = true;
-    };
-  }, [url]);
-  var loadMorePosts = /*#__PURE__*/function () {
-    var _ref3 = (0,_babel_runtime_helpers_asyncToGenerator__WEBPACK_IMPORTED_MODULE_1__["default"])(/*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_3___default().mark(function _callee3() {
-      var response, data, detailedPostsPromises, detailedPosts;
-      return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_3___default().wrap(function _callee3$(_context3) {
-        while (1) switch (_context3.prev = _context3.next) {
-          case 0:
-            if (postData.nextUrl) {
-              _context3.next = 2;
-              break;
-            }
-            return _context3.abrupt("return");
-          case 2:
-            _context3.prev = 2;
-            _context3.next = 5;
-            return fetch(postData.nextUrl, {
-              credentials: "same-origin"
-            });
-          case 5:
-            response = _context3.sent;
-            if (response.ok) {
-              _context3.next = 8;
-              break;
-            }
-            throw new Error(response.statusText);
-          case 8:
-            _context3.next = 10;
-            return response.json();
-          case 10:
-            data = _context3.sent;
-            // Array to hold detailed post data
-            detailedPostsPromises = data.results.map(/*#__PURE__*/function () {
-              var _ref4 = (0,_babel_runtime_helpers_asyncToGenerator__WEBPACK_IMPORTED_MODULE_1__["default"])(/*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_3___default().mark(function _callee2(result) {
-                var postResponse, postData;
-                return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_3___default().wrap(function _callee2$(_context2) {
-                  while (1) switch (_context2.prev = _context2.next) {
-                    case 0:
-                      _context2.next = 2;
-                      return fetch(result.url, {
-                        credentials: "same-origin"
-                      });
-                    case 2:
-                      postResponse = _context2.sent;
-                      if (postResponse.ok) {
-                        _context2.next = 5;
-                        break;
-                      }
-                      throw new Error(postResponse.statusText);
-                    case 5:
-                      _context2.next = 7;
-                      return postResponse.json();
-                    case 7:
-                      postData = _context2.sent;
-                      return _context2.abrupt("return", {
-                        imgUrl: postData.imgUrl,
-                        owner: postData.owner,
-                        ownerImgUrl: postData.ownerImgUrl,
-                        comments: postData.comments,
-                        likes: postData.likes,
-                        created: postData.created,
-                        ownerShowUrl: postData.ownerShowUrl,
-                        postShowUrl: postData.postShowUrl,
-                        postId: postData.postid
-                      });
-                    case 9:
-                    case "end":
-                      return _context2.stop();
-                  }
-                }, _callee2);
-              }));
-              return function (_x) {
-                return _ref4.apply(this, arguments);
-              };
-            }()); // Resolve all the promises to get detailed post data
-            _context3.next = 14;
-            return Promise.all(detailedPostsPromises);
-          case 14:
-            detailedPosts = _context3.sent;
-            // Append new detailed posts to the postData
-            setPostData(function (prevPostData) {
-              return {
-                posts: [].concat((0,_babel_runtime_helpers_toConsumableArray__WEBPACK_IMPORTED_MODULE_0__["default"])(prevPostData.posts), (0,_babel_runtime_helpers_toConsumableArray__WEBPACK_IMPORTED_MODULE_0__["default"])(detailedPosts)),
-                // Append new detailed posts
-                nextUrl: data.nextUrl,
-                hasMore: !!data.nextUrl // Check if there's more to load
-              };
-            });
-            _context3.next = 21;
-            break;
-          case 18:
-            _context3.prev = 18;
-            _context3.t0 = _context3["catch"](2);
-            console.error("Error fetching more posts:", _context3.t0);
-          case 21:
-          case "end":
-            return _context3.stop();
-        }
-      }, _callee3, null, [[2, 18]]);
-    }));
-    return function loadMorePosts() {
-      return _ref3.apply(this, arguments);
-    };
-  }();
+
+    // Only fetch posts if nextUrl is defined
+    if (nextUrl) {
+      fetchPosts();
+    }
+  }, [nextUrl]); // Dependency on nextUrl
+
+  // Resetting scroll position when component mounts
+  (0,react__WEBPACK_IMPORTED_MODULE_4__.useEffect)(function () {
+    window.scrollTo(0, 0); // Scroll to top of the page
+  }, []);
   return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_4___default().createElement("div", {
     className: "post"
   }, loading ? /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_4___default().createElement("p", null, "Loading...") // Show loading message until data arrives
   : /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_4___default().createElement(react_infinite_scroll_component__WEBPACK_IMPORTED_MODULE_8__["default"], {
     dataLength: postData.posts.length // Length of currently loaded posts
     ,
-    next: loadMorePosts // Function to load more
+    next: nextUrl // Function to load more
     ,
-    hasMore: postData.hasMore // Whether there's more to load
+    hasMore: !!nextUrl // Whether there's more to load
     ,
     loader: /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_4___default().createElement("h4", null, "Loading more posts...") // Loading indicator
     ,
@@ -36375,7 +36296,7 @@ var root = (0,react_dom_client__WEBPACK_IMPORTED_MODULE_1__.createRoot)(document
 // This method is only called once
 // Insert the post component into the DOM
 root.render(/*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(react__WEBPACK_IMPORTED_MODULE_0__.StrictMode, null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_post__WEBPACK_IMPORTED_MODULE_2__["default"], {
-  url: "/api/v1/posts/1/"
+  url: "/api/v1/posts/"
 })));
 })();
 

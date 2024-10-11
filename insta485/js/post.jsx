@@ -13,116 +13,64 @@ dayjs.extend(utc);
 export default function Post({ url }) {
   const [loading, setLoading] = useState(true);
   const [postData, setPostData] = useState({
-    imgUrl: "",
-    owner: "",
-    ownerImgUrl: "",
-    comments: [],
-    likes: {
-      numLikes: 0,
-      lognameLikesThis: false,
-      url: ""
-    },
-    created: "",
-    ownerShowUrl: "",
-    postShowUrl: "",
-    postId: 1,
+    posts: [],
   });
-  const [pagenation, setPagenation] = useState({
-    next: "",
-    results: [],
-    url: ""
-  })
+  const [nextUrl, setNextUrl] = useState(url); // Initialize nextUrl with the provided URL
 
   // Fetch posts
-  // 1. fetch api/v1/posts/
-  // 2. 10 posts are put in the results (with urls and post ids ())
-  //      - if less, next will be empty
-  //      - if more, next will have the next page
-  // 3. fetch api/v1/posts/<post_id> for each post id (full url)
-  // 4. 
   useEffect(() => {
-    let ignoreStaleRequest = false;
-
-    const fetchPostData = async () => {
+    const fetchPosts = async () => {
       try {
-        const response = await fetch(url, { credentials: "same-origin" });
+        setLoading(true); // Set loading to true at the start
+        const response = await fetch(nextUrl, { credentials: "same-origin" });
         if (!response.ok) throw new Error(response.statusText);
         const data = await response.json();
 
-        if (!ignoreStaleRequest) {
-          setPostData((prevPostData) => ({
-            posts: [
-              {
-                imgUrl: data.imgUrl,
-                owner: data.owner,
-                ownerImgUrl: data.ownerImgUrl,
-                comments: data.comments,
-                likes: data.likes,
-                created: data.created,
-                ownerShowUrl: data.ownerShowUrl,
-                postShowUrl: data.postShowUrl,
-                postId: data.postid,
-              },
-              ...prevPostData.posts, // Keep existing posts (if any)
-            ],
-            nextUrl: data.nextUrl,
-            hasMore: !!data.nextUrl,
-          }));
-          setLoading(false); // Data has been loaded
-        }
+        // Array to hold detailed post data
+        const detailedPostsPromises = data.results.map(async (result) => {
+          const postResponse = await fetch(result.url, { credentials: "same-origin" });
+          if (!postResponse.ok) throw new Error(postResponse.statusText);
+          const postData = await postResponse.json(); // Fetch each post's details
+          return {
+            imgUrl: postData.imgUrl,
+            owner: postData.owner,
+            ownerImgUrl: postData.ownerImgUrl,
+            comments: postData.comments,
+            likes: postData.likes,
+            created: postData.created,
+            ownerShowUrl: postData.ownerShowUrl,
+            postShowUrl: postData.postShowUrl,
+            postId: postData.postid,
+          };
+        });
+
+        // Resolve all the promises to get detailed post data
+        const detailedPosts = await Promise.all(detailedPostsPromises);
+
+        // Append new detailed posts to the postData
+        setPostData((prevPostData) => ({
+          posts: [...prevPostData.posts, ...detailedPosts], // Append new detailed posts
+        }));
+
+        // Update nextUrl state
+        setNextUrl(data.next); // Set nextUrl for pagination
+        setLoading(false); // Set loading to false after fetching
       } catch (error) {
-        console.error("Error fetching post data:", error);
+        console.error("Error fetching posts:", error);
+        setLoading(false); // Ensure loading is set to false on error
       }
     };
 
-    fetchPostData();
-
-    return () => {
-      ignoreStaleRequest = true;
-    };
-  }, [url]);
-
-  const loadMorePosts = async () => {
-    if (!postData.nextUrl) return; // No more posts to load
-  
-    try {
-      const response = await fetch(postData.nextUrl, { credentials: "same-origin" });
-      if (!response.ok) throw new Error(response.statusText);
-      const data = await response.json();
-  
-      // Array to hold detailed post data
-      const detailedPostsPromises = data.results.map(async (result) => {
-        const postResponse = await fetch(result.url, { credentials: "same-origin" });
-        if (!postResponse.ok) throw new Error(postResponse.statusText);
-        const postData = await postResponse.json(); // Fetch each post's details
-  
-        return {
-          imgUrl: postData.imgUrl,
-          owner: postData.owner,
-          ownerImgUrl: postData.ownerImgUrl,
-          comments: postData.comments,
-          likes: postData.likes,
-          created: postData.created,
-          ownerShowUrl: postData.ownerShowUrl,
-          postShowUrl: postData.postShowUrl,
-          postId: postData.postid,
-        };
-      });
-  
-      // Resolve all the promises to get detailed post data
-      const detailedPosts = await Promise.all(detailedPostsPromises);
-  
-      // Append new detailed posts to the postData
-      setPostData((prevPostData) => ({
-        posts: [...prevPostData.posts, ...detailedPosts], // Append new detailed posts
-        nextUrl: data.nextUrl,
-        hasMore: !!data.nextUrl, // Check if there's more to load
-      }));
-    } catch (error) {
-      console.error("Error fetching more posts:", error);
+    // Only fetch posts if nextUrl is defined
+    if (nextUrl) {
+      fetchPosts();
     }
-  };
-  
+  }, [nextUrl]); // Dependency on nextUrl
+
+  // Resetting scroll position when component mounts
+  useEffect(() => {
+    window.scrollTo(0, 0); // Scroll to top of the page
+  }, []);
 
   return (
     <div className="post">
@@ -131,8 +79,8 @@ export default function Post({ url }) {
       ) : (
         <InfiniteScroll
           dataLength={postData.posts.length} // Length of currently loaded posts
-          next={loadMorePosts} // Function to load more
-          hasMore={postData.hasMore} // Whether there's more to load
+          next={nextUrl} // Function to load more
+          hasMore={!!nextUrl} // Whether there's more to load
           loader={<h4>Loading more posts...</h4>} // Loading indicator
           endMessage={<p>No more posts to display.</p>} // End message
         >
