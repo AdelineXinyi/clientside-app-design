@@ -365,6 +365,9 @@ function Comments(_ref) {
     _useState4 = (0,_babel_runtime_helpers_slicedToArray__WEBPACK_IMPORTED_MODULE_1__["default"])(_useState3, 2),
     newCommentText = _useState4[0],
     setNewCommentText = _useState4[1];
+  (0,react__WEBPACK_IMPORTED_MODULE_2__.useEffect)(function () {
+    setComments(initialComments);
+  }, [initialComments]);
   var handleDelete = function handleDelete(commentid) {
     var deleteCommentUrl = "/api/v1/comments/".concat(commentid);
     fetch(deleteCommentUrl, {
@@ -417,7 +420,10 @@ function Comments(_ref) {
   return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_2___default().createElement("div", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_2___default().createElement("section", null, comments.map(function (comment) {
     return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_2___default().createElement("form", {
       key: comment.commentid,
-      "data-testid": "comment-text"
+      "data-testid": "comment-text",
+      onSubmit: function onSubmit(e) {
+        return e.preventDefault();
+      }
     }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_2___default().createElement("div", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_2___default().createElement("p", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_2___default().createElement("a", {
       href: comment.ownerShowUrl
     }, comment.owner), ": ", comment.text), comment.lognameOwnsThis && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_2___default().createElement("button", {

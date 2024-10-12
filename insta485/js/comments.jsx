@@ -1,9 +1,13 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import PropTypes from "prop-types";
 
 export default function Comments({ postid, initialComments }) {
   const [comments, setComments] = useState(initialComments);
   const [newCommentText, setNewCommentText] = useState("");
+
+  useEffect(() => {
+    setComments(initialComments);
+  }, [initialComments]);
 
   const handleDelete = (commentid) => {
     const deleteCommentUrl = `/api/v1/comments/${commentid}`;
@@ -53,7 +57,8 @@ export default function Comments({ postid, initialComments }) {
     <div>
       <section>
         {comments.map((comment) => (
-          <form key={comment.commentid} data-testid="comment-text">
+          <form key={comment.commentid} data-testid="comment-text" 
+            onSubmit={(e) => e.preventDefault()}>
             <div>
               <p>
                 <a href={comment.ownerShowUrl}>{comment.owner}</a>: {comment.text}
