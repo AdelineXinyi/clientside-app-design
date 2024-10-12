@@ -741,7 +741,7 @@ function Post(_ref) {
   // Fetch posts when the component mounts (initial load)
   (0,react__WEBPACK_IMPORTED_MODULE_4__.useEffect)(function () {
     fetchPosts(); // Call fetchPosts once when the component mounts
-  }); // Empty dependency array ensures this runs only once
+  }, []); // Empty dependency array ensures this runs only once
 
   // Resetting scroll position when component mounts
   (0,react__WEBPACK_IMPORTED_MODULE_4__.useEffect)(function () {

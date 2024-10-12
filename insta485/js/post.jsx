@@ -70,7 +70,7 @@ export default function Post({ url }) {
   // Fetch posts when the component mounts (initial load)
   useEffect(() => {
     fetchPosts(); // Call fetchPosts once when the component mounts
-  }); // Empty dependency array ensures this runs only once
+  }, []); // Empty dependency array ensures this runs only once
 
   // Resetting scroll position when component mounts
   useEffect(() => {
