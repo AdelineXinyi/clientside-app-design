@@ -13,12 +13,12 @@ export default function Comments({ postid, initialComments }) {
     const deleteCommentUrl = `/api/v1/comments/${commentid}`;
     fetch(deleteCommentUrl, { credentials: "same-origin", method: "DELETE" })
       .then((response) => {
-        if (!response.ok) throw Error(response.statusText);
+        if (!response.ok) throw new Error(response.statusText);
         setComments((prevComments) =>
           prevComments.filter((comment) => comment.commentid !== commentid),
         );
       })
-      .catch((error) => console.log(error));
+      .catch((error) => console.error("Error deleting comment:", error));
   };
 
   const handleSubmit = (event) => {
@@ -34,7 +34,7 @@ export default function Comments({ postid, initialComments }) {
         body: JSON.stringify({ text: newCommentText }),
       })
         .then((response) => {
-          if (!response.ok) throw Error(response.statusText);
+          if (!response.ok) throw new Error(response.statusText);
           return response.json();
         })
         .then((data) => {
@@ -51,7 +51,7 @@ export default function Comments({ postid, initialComments }) {
           ]);
           setNewCommentText("");
         })
-        .catch((error) => console.log(error));
+        .catch((error) => console.error("Error adding comment:", error));
     }
   };
 

@@ -14,24 +14,24 @@ export default function Post({ url }) {
   const [postData, setPostData] = useState({
     posts: [],
   });
-  const [nextUrl, setNextUrl] = useState(url); // Initialize nextUrl with the provided URL
-  const [hasMore, setHasMore] = useState(true); // To control when to stop infinite scroll
+  const [nextUrl, setNextUrl] = useState(url);
+  const [hasMore, setHasMore] = useState(true);
 
-  // Fetch posts function
   const fetchPosts = useCallback(async () => {
-    if (!nextUrl) return; // If there's no next URL, stop the function
+    if (!nextUrl) return;
+
     try {
       const response = await fetch(nextUrl, { credentials: "same-origin" });
       if (!response.ok) throw new Error(response.statusText);
       const data = await response.json();
 
-      // Array to hold detailed post data
       const detailedPostsPromises = data.results.map(async (result) => {
         const postResponse = await fetch(result.url, {
           credentials: "same-origin",
         });
         if (!postResponse.ok) throw new Error(postResponse.statusText);
-        const postDetail = await postResponse.json(); // Fetch each post's details
+        const postDetail = await postResponse.json();
+
         return {
           imgUrl: postDetail.imgUrl,
           owner: postDetail.owner,
@@ -45,10 +45,8 @@ export default function Post({ url }) {
         };
       });
 
-      // Resolve all the promises to get detailed post data
       const detailedPosts = await Promise.all(detailedPostsPromises);
 
-      // Append new detailed posts to the postData
       setPostData((prevPostData) => {
         const existingPostIds = new Set(
           prevPostData.posts.map((post) => post.postId),
@@ -58,39 +56,36 @@ export default function Post({ url }) {
         );
 
         return {
-          posts: [...prevPostData.posts, ...newPosts], // Append only unique new posts
+          posts: [...prevPostData.posts, ...newPosts],
         };
       });
 
-      // Update nextUrl state for pagination
       if (data.next) {
         setNextUrl(data.next);
       } else {
-        setHasMore(false); // If there's no next URL, stop infinite scroll
+        setHasMore(false);
       }
     } catch (error) {
       console.error("Error fetching posts:", error);
     }
-  }, [nextUrl]); // Add nextUrl as a dependency
+  }, [nextUrl]);
 
-  // Fetch posts when the component mounts (initial load)
   useEffect(() => {
     fetchPosts();
   }, [fetchPosts]);
 
-  // Resetting scroll position when component mounts
   useEffect(() => {
-    window.scrollTo(0, 0); // Scroll to top of the page
+    window.scrollTo(0, 0);
   }, []);
 
   return (
     <div className="post">
       <InfiniteScroll
-        dataLength={postData.posts.length} // Length of currently loaded posts
-        next={fetchPosts} // Function to load more when scrolling
-        hasMore={hasMore} // Whether there's more to load
-        loader={<h4>Loading more posts...</h4>} // Loading indicator
-        endMessage={<p>No more posts to display.</p>} // End message when no more posts
+        dataLength={postData.posts.length}
+        next={fetchPosts}
+        hasMore={hasMore}
+        loader={<h4>Loading more posts...</h4>}
+        endMessage={<p>No more posts to display.</p>}
       >
         {[...postData.posts].map((post) => (
           <div key={post.postId} className="additional-posts">

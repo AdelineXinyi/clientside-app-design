@@ -12,7 +12,7 @@ export default function Likes({ postid, initialLikes, postURL }) {
     const makeLikeUrl = `/api/v1/likes/?postid=${postid}`;
     fetch(makeLikeUrl, { credentials: "same-origin", method: "POST" })
       .then((response) => {
-        if (!response.ok) throw Error(response.statusText);
+        if (!response.ok) throw new Error(response.statusText);
         return response.json();
       })
       .then((data) => {
@@ -23,14 +23,14 @@ export default function Likes({ postid, initialLikes, postURL }) {
           url: data.url,
         }));
       })
-      .catch((error) => console.log(error));
+      .catch((error) => console.error("Error liking post:", error));
   };
 
   const handleUnlike = () => {
     const deleteLikeUrl = likes.url;
     fetch(deleteLikeUrl, { credentials: "same-origin", method: "DELETE" })
       .then((response) => {
-        if (!response.ok) throw Error(response.statusText);
+        if (!response.ok) throw new Error(response.statusText);
       })
       .then(() => {
         setLikes((prevLikes) => ({
@@ -40,7 +40,7 @@ export default function Likes({ postid, initialLikes, postURL }) {
           url: null,
         }));
       })
-      .catch((error) => console.log(error));
+      .catch((error) => console.error("Error unliking post:", error));
   };
 
   const handleDoubleClick = () => {
@@ -52,10 +52,10 @@ export default function Likes({ postid, initialLikes, postURL }) {
   return (
     <div>
       <img
-        src={postURL} // Replace with the actual image URL
+        src={postURL}
         alt="Post"
-        onDoubleClick={handleDoubleClick} // Handle double-click for likes
-        style={{ cursor: "pointer" }} // Optional: change cursor to pointer for better UX
+        onDoubleClick={handleDoubleClick}
+        style={{ cursor: "pointer" }}
       />
       <button
         type="button"

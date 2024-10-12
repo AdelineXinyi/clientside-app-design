@@ -17,3 +17,5 @@ pylint insta485
 # Run all unit tests using pytest
 pytest -v tests
 
+npx eslint --ext jsx insta485/js
+npx prettier --check insta485/js
