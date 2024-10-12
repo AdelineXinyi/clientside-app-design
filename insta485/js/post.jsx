@@ -27,21 +27,19 @@ export default function Post({ url }) {
 
       // Array to hold detailed post data
       const detailedPostsPromises = data.results.map(async (result) => {
-        const postResponse = await fetch(result.url, {
-          credentials: "same-origin",
-        });
+        const postResponse = await fetch(result.url, { credentials: "same-origin" });
         if (!postResponse.ok) throw new Error(postResponse.statusText);
-        const postData = await postResponse.json(); // Fetch each post's details
+        const postDetail = await postResponse.json(); // Fetch each post's details
         return {
-          imgUrl: postData.imgUrl,
-          owner: postData.owner,
-          ownerImgUrl: postData.ownerImgUrl,
-          comments: postData.comments,
-          likes: postData.likes,
-          created: postData.created,
-          ownerShowUrl: postData.ownerShowUrl,
-          postShowUrl: postData.postShowUrl,
-          postId: postData.postid,
+          imgUrl: postDetail.imgUrl,
+          owner: postDetail.owner,
+          ownerImgUrl: postDetail.ownerImgUrl,
+          comments: postDetail.comments,
+          likes: postDetail.likes,
+          created: postDetail.created,
+          ownerShowUrl: postDetail.ownerShowUrl,
+          postShowUrl: postDetail.postShowUrl,
+          postId: postDetail.postid,
         };
       });
 
@@ -50,12 +48,8 @@ export default function Post({ url }) {
 
       // Append new detailed posts to the postData
       setPostData((prevPostData) => {
-        const existingPostIds = new Set(
-          prevPostData.posts.map((post) => post.postId),
-        );
-        const newPosts = detailedPosts.filter(
-          (post) => !existingPostIds.has(post.postId),
-        );
+        const existingPostIds = new Set(prevPostData.posts.map(post => post.postId));
+        const newPosts = detailedPosts.filter(post => !existingPostIds.has(post.postId));
 
         return {
           posts: [...prevPostData.posts, ...newPosts], // Append only unique new posts
@@ -76,7 +70,7 @@ export default function Post({ url }) {
   // Fetch posts when the component mounts (initial load)
   useEffect(() => {
     fetchPosts(); // Call fetchPosts once when the component mounts
-  }, []); // Empty dependency array ensures this runs only once
+  }); // Empty dependency array ensures this runs only once
 
   // Resetting scroll position when component mounts
   useEffect(() => {
@@ -107,11 +101,7 @@ export default function Post({ url }) {
                 {dayjs.utc(post.created).local().fromNow()}
               </a>
             </p>
-            <Likes
-              postid={post.postId}
-              initialLikes={post.likes}
-              postURL={post.imgUrl}
-            />
+            <Likes postid={post.postId} initialLikes={post.likes} postURL={post.imgUrl} />
             <Comments postid={post.postId} initialComments={post.comments} />
           </div>
         ))}
