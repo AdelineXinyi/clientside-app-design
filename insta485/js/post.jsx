@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import PropTypes from "prop-types";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
@@ -18,7 +18,7 @@ export default function Post({ url }) {
   const [hasMore, setHasMore] = useState(true); // To control when to stop infinite scroll
 
   // Fetch posts function
-  const fetchPosts = async () => {
+  const fetchPosts = useCallback(async () => {
     if (!nextUrl) return; // If there's no next URL, stop the function
     try {
       const response = await fetch(nextUrl, { credentials: "same-origin" });
@@ -65,12 +65,12 @@ export default function Post({ url }) {
     } catch (error) {
       console.error("Error fetching posts:", error);
     }
-  };
+  }, [nextUrl]); // Add nextUrl as a dependency
 
   // Fetch posts when the component mounts (initial load)
   useEffect(() => {
     fetchPosts(); // Call fetchPosts once when the component mounts
-  }, []); // Empty dependency array ensures this runs only once
+  }, [fetchPosts]); // Include fetchPosts in the dependency array
 
   // Resetting scroll position when component mounts
   useEffect(() => {

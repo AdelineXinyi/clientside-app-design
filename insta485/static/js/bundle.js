@@ -625,123 +625,118 @@ function Post(_ref) {
     setHasMore = _useState6[1]; // To control when to stop infinite scroll
 
   // Fetch posts function
-  var fetchPosts = /*#__PURE__*/function () {
-    var _ref2 = (0,_babel_runtime_helpers_asyncToGenerator__WEBPACK_IMPORTED_MODULE_1__["default"])(/*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_3___default().mark(function _callee2() {
-      var response, data, detailedPostsPromises, detailedPosts;
-      return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_3___default().wrap(function _callee2$(_context2) {
-        while (1) switch (_context2.prev = _context2.next) {
-          case 0:
-            if (nextUrl) {
-              _context2.next = 2;
-              break;
-            }
-            return _context2.abrupt("return");
-          case 2:
-            _context2.prev = 2;
-            _context2.next = 5;
-            return fetch(nextUrl, {
-              credentials: "same-origin"
-            });
-          case 5:
-            response = _context2.sent;
-            if (response.ok) {
-              _context2.next = 8;
-              break;
-            }
-            throw new Error(response.statusText);
-          case 8:
-            _context2.next = 10;
-            return response.json();
-          case 10:
-            data = _context2.sent;
-            // Array to hold detailed post data
-            detailedPostsPromises = data.results.map(/*#__PURE__*/function () {
-              var _ref3 = (0,_babel_runtime_helpers_asyncToGenerator__WEBPACK_IMPORTED_MODULE_1__["default"])(/*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_3___default().mark(function _callee(result) {
-                var postResponse, postDetail;
-                return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_3___default().wrap(function _callee$(_context) {
-                  while (1) switch (_context.prev = _context.next) {
-                    case 0:
-                      _context.next = 2;
-                      return fetch(result.url, {
-                        credentials: "same-origin"
-                      });
-                    case 2:
-                      postResponse = _context.sent;
-                      if (postResponse.ok) {
-                        _context.next = 5;
-                        break;
-                      }
-                      throw new Error(postResponse.statusText);
-                    case 5:
-                      _context.next = 7;
-                      return postResponse.json();
-                    case 7:
-                      postDetail = _context.sent;
-                      return _context.abrupt("return", {
-                        imgUrl: postDetail.imgUrl,
-                        owner: postDetail.owner,
-                        ownerImgUrl: postDetail.ownerImgUrl,
-                        comments: postDetail.comments,
-                        likes: postDetail.likes,
-                        created: postDetail.created,
-                        ownerShowUrl: postDetail.ownerShowUrl,
-                        postShowUrl: postDetail.postShowUrl,
-                        postId: postDetail.postid
-                      });
-                    case 9:
-                    case "end":
-                      return _context.stop();
-                  }
-                }, _callee);
-              }));
-              return function (_x) {
-                return _ref3.apply(this, arguments);
-              };
-            }()); // Resolve all the promises to get detailed post data
-            _context2.next = 14;
-            return Promise.all(detailedPostsPromises);
-          case 14:
-            detailedPosts = _context2.sent;
-            // Append new detailed posts to the postData
-            setPostData(function (prevPostData) {
-              var existingPostIds = new Set(prevPostData.posts.map(function (post) {
-                return post.postId;
-              }));
-              var newPosts = detailedPosts.filter(function (post) {
-                return !existingPostIds.has(post.postId);
-              });
-              return {
-                posts: [].concat((0,_babel_runtime_helpers_toConsumableArray__WEBPACK_IMPORTED_MODULE_0__["default"])(prevPostData.posts), (0,_babel_runtime_helpers_toConsumableArray__WEBPACK_IMPORTED_MODULE_0__["default"])(newPosts)) // Append only unique new posts
-              };
-            });
-
-            // Update nextUrl state for pagination
-            if (data.next) {
-              setNextUrl(data.next);
-            } else {
-              setHasMore(false); // If there's no next URL, stop infinite scroll
-            }
-            _context2.next = 22;
+  var fetchPosts = (0,react__WEBPACK_IMPORTED_MODULE_4__.useCallback)(/*#__PURE__*/(0,_babel_runtime_helpers_asyncToGenerator__WEBPACK_IMPORTED_MODULE_1__["default"])(/*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_3___default().mark(function _callee2() {
+    var response, data, detailedPostsPromises, detailedPosts;
+    return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_3___default().wrap(function _callee2$(_context2) {
+      while (1) switch (_context2.prev = _context2.next) {
+        case 0:
+          if (nextUrl) {
+            _context2.next = 2;
             break;
-          case 19:
-            _context2.prev = 19;
-            _context2.t0 = _context2["catch"](2);
-            console.error("Error fetching posts:", _context2.t0);
-          case 22:
-          case "end":
-            return _context2.stop();
-        }
-      }, _callee2, null, [[2, 19]]);
-    }));
-    return function fetchPosts() {
-      return _ref2.apply(this, arguments);
-    };
-  }();
+          }
+          return _context2.abrupt("return");
+        case 2:
+          _context2.prev = 2;
+          _context2.next = 5;
+          return fetch(nextUrl, {
+            credentials: "same-origin"
+          });
+        case 5:
+          response = _context2.sent;
+          if (response.ok) {
+            _context2.next = 8;
+            break;
+          }
+          throw new Error(response.statusText);
+        case 8:
+          _context2.next = 10;
+          return response.json();
+        case 10:
+          data = _context2.sent;
+          // Array to hold detailed post data
+          detailedPostsPromises = data.results.map(/*#__PURE__*/function () {
+            var _ref3 = (0,_babel_runtime_helpers_asyncToGenerator__WEBPACK_IMPORTED_MODULE_1__["default"])(/*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_3___default().mark(function _callee(result) {
+              var postResponse, postDetail;
+              return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_3___default().wrap(function _callee$(_context) {
+                while (1) switch (_context.prev = _context.next) {
+                  case 0:
+                    _context.next = 2;
+                    return fetch(result.url, {
+                      credentials: "same-origin"
+                    });
+                  case 2:
+                    postResponse = _context.sent;
+                    if (postResponse.ok) {
+                      _context.next = 5;
+                      break;
+                    }
+                    throw new Error(postResponse.statusText);
+                  case 5:
+                    _context.next = 7;
+                    return postResponse.json();
+                  case 7:
+                    postDetail = _context.sent;
+                    return _context.abrupt("return", {
+                      imgUrl: postDetail.imgUrl,
+                      owner: postDetail.owner,
+                      ownerImgUrl: postDetail.ownerImgUrl,
+                      comments: postDetail.comments,
+                      likes: postDetail.likes,
+                      created: postDetail.created,
+                      ownerShowUrl: postDetail.ownerShowUrl,
+                      postShowUrl: postDetail.postShowUrl,
+                      postId: postDetail.postid
+                    });
+                  case 9:
+                  case "end":
+                    return _context.stop();
+                }
+              }, _callee);
+            }));
+            return function (_x) {
+              return _ref3.apply(this, arguments);
+            };
+          }()); // Resolve all the promises to get detailed post data
+          _context2.next = 14;
+          return Promise.all(detailedPostsPromises);
+        case 14:
+          detailedPosts = _context2.sent;
+          // Append new detailed posts to the postData
+          setPostData(function (prevPostData) {
+            var existingPostIds = new Set(prevPostData.posts.map(function (post) {
+              return post.postId;
+            }));
+            var newPosts = detailedPosts.filter(function (post) {
+              return !existingPostIds.has(post.postId);
+            });
+            return {
+              posts: [].concat((0,_babel_runtime_helpers_toConsumableArray__WEBPACK_IMPORTED_MODULE_0__["default"])(prevPostData.posts), (0,_babel_runtime_helpers_toConsumableArray__WEBPACK_IMPORTED_MODULE_0__["default"])(newPosts)) // Append only unique new posts
+            };
+          });
+
+          // Update nextUrl state for pagination
+          if (data.next) {
+            setNextUrl(data.next);
+          } else {
+            setHasMore(false); // If there's no next URL, stop infinite scroll
+          }
+          _context2.next = 22;
+          break;
+        case 19:
+          _context2.prev = 19;
+          _context2.t0 = _context2["catch"](2);
+          console.error("Error fetching posts:", _context2.t0);
+        case 22:
+        case "end":
+          return _context2.stop();
+      }
+    }, _callee2, null, [[2, 19]]);
+  })), [nextUrl]); // Add nextUrl as a dependency
 
   // Fetch posts when the component mounts (initial load)
   (0,react__WEBPACK_IMPORTED_MODULE_4__.useEffect)(function () {
     fetchPosts(); // Call fetchPosts once when the component mounts
-  }, []); // Empty dependency array ensures this runs only once
+  }, [fetchPosts]); // Include fetchPosts in the dependency array
 
   // Resetting scroll position when component mounts
   (0,react__WEBPACK_IMPORTED_MODULE_4__.useEffect)(function () {
