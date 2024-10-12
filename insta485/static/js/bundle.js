@@ -371,8 +371,8 @@ function Comments(_ref) {
   var handleDelete = function handleDelete(commentid) {
     var deleteCommentUrl = "/api/v1/comments/".concat(commentid);
     fetch(deleteCommentUrl, {
-      credentials: "same-origin",
-      method: "DELETE"
+      credentials: 'same-origin',
+      method: 'DELETE'
     }).then(function (response) {
       if (!response.ok) throw Error(response.statusText);
       setComments(function (prevComments) {
@@ -385,14 +385,14 @@ function Comments(_ref) {
     });
   };
   var handleSubmit = function handleSubmit(event) {
-    if (event.key === "Enter" && newCommentText.trim()) {
+    if (event.key === 'Enter' && newCommentText.trim()) {
       event.preventDefault(); // Prevent default behavior for Enter key
       var makeCommentUrl = "/api/v1/comments/?postid=".concat(postid);
       fetch(makeCommentUrl, {
-        credentials: "same-origin",
-        method: "POST",
+        credentials: 'same-origin',
+        method: 'POST',
         headers: {
-          "Content-Type": "application/json"
+          'Content-Type': 'application/json'
         },
         body: JSON.stringify({
           text: newCommentText
@@ -426,7 +426,8 @@ function Comments(_ref) {
       }
     }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_2___default().createElement("div", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_2___default().createElement("p", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_2___default().createElement("a", {
       href: comment.ownerShowUrl
-    }, comment.owner), ":", " ", comment.text), comment.lognameOwnsThis && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_2___default().createElement("button", {
+    }, comment.owner), ": ", comment.text), comment.lognameOwnsThis && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_2___default().createElement("button", {
+      type: "button",
       "data-testid": "delete-comment-button",
       onClick: function onClick() {
         return handleDelete(comment.commentid);
@@ -495,8 +496,8 @@ function Likes(_ref) {
   var handleLike = function handleLike() {
     var makeLikeUrl = "/api/v1/likes/?postid=".concat(postid);
     fetch(makeLikeUrl, {
-      credentials: "same-origin",
-      method: "POST"
+      credentials: 'same-origin',
+      method: 'POST'
     }).then(function (response) {
       if (!response.ok) throw Error(response.statusText);
       return response.json();
@@ -515,8 +516,8 @@ function Likes(_ref) {
   var handleUnlike = function handleUnlike() {
     var deleteLikeUrl = likes.url;
     fetch(deleteLikeUrl, {
-      credentials: "same-origin",
-      method: "DELETE"
+      credentials: 'same-origin',
+      method: 'DELETE'
     }).then(function (response) {
       if (!response.ok) throw Error(response.statusText);
     }).then(function () {
@@ -543,12 +544,13 @@ function Likes(_ref) {
     onDoubleClick: handleDoubleClick // Handle double-click for likes
     ,
     style: {
-      cursor: "pointer"
+      cursor: 'pointer'
     } // Optional: change cursor to pointer for better UX
   }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_2___default().createElement("button", {
+    type: "button",
     "data-testid": "like-unlike-button",
     onClick: likes.lognameLikesThis ? handleUnlike : handleLike
-  }, likes.lognameLikesThis ? "Unlike" : "Like"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_2___default().createElement("p", null, likes.numLikes, " ", likes.numLikes === 1 ? "like" : "likes"));
+  }, likes.lognameLikesThis ? 'Unlike' : 'Like'), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_2___default().createElement("p", null, likes.numLikes, " ", likes.numLikes === 1 ? 'like' : 'likes'));
 }
 Likes.propTypes = {
   postid: (prop_types__WEBPACK_IMPORTED_MODULE_3___default().number).isRequired,
@@ -556,7 +558,8 @@ Likes.propTypes = {
     numLikes: (prop_types__WEBPACK_IMPORTED_MODULE_3___default().number).isRequired,
     lognameLikesThis: (prop_types__WEBPACK_IMPORTED_MODULE_3___default().bool).isRequired,
     url: (prop_types__WEBPACK_IMPORTED_MODULE_3___default().string)
-  }).isRequired
+  }).isRequired,
+  postURL: (prop_types__WEBPACK_IMPORTED_MODULE_3___default().string).isRequired
 };
 
 /***/ }),
@@ -654,7 +657,7 @@ function Post(_ref) {
             // Array to hold detailed post data
             detailedPostsPromises = data.results.map(/*#__PURE__*/function () {
               var _ref3 = (0,_babel_runtime_helpers_asyncToGenerator__WEBPACK_IMPORTED_MODULE_1__["default"])(/*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_3___default().mark(function _callee(result) {
-                var postResponse, postData;
+                var postResponse, postDetail;
                 return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_3___default().wrap(function _callee$(_context) {
                   while (1) switch (_context.prev = _context.next) {
                     case 0:
@@ -673,17 +676,17 @@ function Post(_ref) {
                       _context.next = 7;
                       return postResponse.json();
                     case 7:
-                      postData = _context.sent;
+                      postDetail = _context.sent;
                       return _context.abrupt("return", {
-                        imgUrl: postData.imgUrl,
-                        owner: postData.owner,
-                        ownerImgUrl: postData.ownerImgUrl,
-                        comments: postData.comments,
-                        likes: postData.likes,
-                        created: postData.created,
-                        ownerShowUrl: postData.ownerShowUrl,
-                        postShowUrl: postData.postShowUrl,
-                        postId: postData.postid
+                        imgUrl: postDetail.imgUrl,
+                        owner: postDetail.owner,
+                        ownerImgUrl: postDetail.ownerImgUrl,
+                        comments: postDetail.comments,
+                        likes: postDetail.likes,
+                        created: postDetail.created,
+                        ownerShowUrl: postDetail.ownerShowUrl,
+                        postShowUrl: postDetail.postShowUrl,
+                        postId: postDetail.postid
                       });
                     case 9:
                     case "end":
@@ -738,7 +741,7 @@ function Post(_ref) {
   // Fetch posts when the component mounts (initial load)
   (0,react__WEBPACK_IMPORTED_MODULE_4__.useEffect)(function () {
     fetchPosts(); // Call fetchPosts once when the component mounts
-  }, []); // Empty dependency array ensures this runs only once
+  }); // Empty dependency array ensures this runs only once
 
   // Resetting scroll position when component mounts
   (0,react__WEBPACK_IMPORTED_MODULE_4__.useEffect)(function () {
