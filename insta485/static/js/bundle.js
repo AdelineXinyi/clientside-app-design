@@ -371,8 +371,8 @@ function Comments(_ref) {
   var handleDelete = function handleDelete(commentid) {
     var deleteCommentUrl = "/api/v1/comments/".concat(commentid);
     fetch(deleteCommentUrl, {
-      credentials: 'same-origin',
-      method: 'DELETE'
+      credentials: "same-origin",
+      method: "DELETE"
     }).then(function (response) {
       if (!response.ok) throw Error(response.statusText);
       setComments(function (prevComments) {
@@ -385,14 +385,14 @@ function Comments(_ref) {
     });
   };
   var handleSubmit = function handleSubmit(event) {
-    if (event.key === 'Enter' && newCommentText.trim()) {
+    if (event.key === "Enter" && newCommentText.trim()) {
       event.preventDefault(); // Prevent default behavior for Enter key
       var makeCommentUrl = "/api/v1/comments/?postid=".concat(postid);
       fetch(makeCommentUrl, {
-        credentials: 'same-origin',
-        method: 'POST',
+        credentials: "same-origin",
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json'
+          "Content-Type": "application/json"
         },
         body: JSON.stringify({
           text: newCommentText
@@ -426,7 +426,7 @@ function Comments(_ref) {
       }
     }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_2___default().createElement("div", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_2___default().createElement("p", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_2___default().createElement("a", {
       href: comment.ownerShowUrl
-    }, comment.owner), ": ", comment.text), comment.lognameOwnsThis && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_2___default().createElement("button", {
+    }, comment.owner), ":", " ", comment.text), comment.lognameOwnsThis && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_2___default().createElement("button", {
       "data-testid": "delete-comment-button",
       onClick: function onClick() {
         return handleDelete(comment.commentid);
@@ -495,8 +495,8 @@ function Likes(_ref) {
   var handleLike = function handleLike() {
     var makeLikeUrl = "/api/v1/likes/?postid=".concat(postid);
     fetch(makeLikeUrl, {
-      credentials: 'same-origin',
-      method: 'POST'
+      credentials: "same-origin",
+      method: "POST"
     }).then(function (response) {
       if (!response.ok) throw Error(response.statusText);
       return response.json();
@@ -515,8 +515,8 @@ function Likes(_ref) {
   var handleUnlike = function handleUnlike() {
     var deleteLikeUrl = likes.url;
     fetch(deleteLikeUrl, {
-      credentials: 'same-origin',
-      method: 'DELETE'
+      credentials: "same-origin",
+      method: "DELETE"
     }).then(function (response) {
       if (!response.ok) throw Error(response.statusText);
     }).then(function () {
@@ -543,12 +543,12 @@ function Likes(_ref) {
     onDoubleClick: handleDoubleClick // Handle double-click for likes
     ,
     style: {
-      cursor: 'pointer'
+      cursor: "pointer"
     } // Optional: change cursor to pointer for better UX
   }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_2___default().createElement("button", {
     "data-testid": "like-unlike-button",
     onClick: likes.lognameLikesThis ? handleUnlike : handleLike
-  }, likes.lognameLikesThis ? 'Unlike' : 'Like'), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_2___default().createElement("p", null, likes.numLikes, " ", likes.numLikes === 1 ? 'like' : 'likes'));
+  }, likes.lognameLikesThis ? "Unlike" : "Like"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_2___default().createElement("p", null, likes.numLikes, " ", likes.numLikes === 1 ? "like" : "likes"));
 }
 Likes.propTypes = {
   postid: (prop_types__WEBPACK_IMPORTED_MODULE_3___default().number).isRequired,
