@@ -365,9 +365,6 @@ function Comments(_ref) {
     _useState4 = (0,_babel_runtime_helpers_slicedToArray__WEBPACK_IMPORTED_MODULE_1__["default"])(_useState3, 2),
     newCommentText = _useState4[0],
     setNewCommentText = _useState4[1];
-  (0,react__WEBPACK_IMPORTED_MODULE_2__.useEffect)(function () {
-    setComments(initialComments);
-  }, [initialComments]);
   var handleDelete = function handleDelete(commentid) {
     var deleteCommentUrl = "/api/v1/comments/".concat(commentid);
     fetch(deleteCommentUrl, {
@@ -480,7 +477,8 @@ function _objectSpread(e) { for (var r = 1; r < arguments.length; r++) { var t =
 
 function Likes(_ref) {
   var postid = _ref.postid,
-    initialLikes = _ref.initialLikes;
+    initialLikes = _ref.initialLikes,
+    postURL = _ref.postURL;
   var _useState = (0,react__WEBPACK_IMPORTED_MODULE_2__.useState)(initialLikes),
     _useState2 = (0,_babel_runtime_helpers_slicedToArray__WEBPACK_IMPORTED_MODULE_1__["default"])(_useState, 2),
     likes = _useState2[0],
@@ -532,12 +530,19 @@ function Likes(_ref) {
       handleLike();
     }
   };
-  return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_2___default().createElement("div", {
-    onDoubleClick: handleDoubleClick
-  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_2___default().createElement("button", {
+  return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_2___default().createElement("div", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_2___default().createElement("img", {
+    src: postURL // Replace with the actual image URL
+    ,
+    alt: "Post",
+    onDoubleClick: handleDoubleClick // Handle double-click for likes
+    ,
+    style: {
+      cursor: 'pointer'
+    } // Optional: change cursor to pointer for better UX
+  }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_2___default().createElement("button", {
     "data-testid": "like-unlike-button",
     onClick: likes.lognameLikesThis ? handleUnlike : handleLike
-  }, likes.lognameLikesThis ? 'Unlike' : 'Like'), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_2___default().createElement("p", null, likes.numLikes, " ", likes.numLikes === 1 ? 'Like' : 'Likes'));
+  }, likes.lognameLikesThis ? 'Unlike' : 'Like'), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_2___default().createElement("p", null, likes.numLikes, " ", likes.numLikes === 1 ? 'like' : 'likes'));
 }
 Likes.propTypes = {
   postid: (prop_types__WEBPACK_IMPORTED_MODULE_3___default().number).isRequired,
@@ -595,134 +600,139 @@ dayjs__WEBPACK_IMPORTED_MODULE_5___default().extend((dayjs_plugin_relativeTime__
 dayjs__WEBPACK_IMPORTED_MODULE_5___default().extend((dayjs_plugin_utc__WEBPACK_IMPORTED_MODULE_7___default()));
 function Post(_ref) {
   var url = _ref.url;
-  var _useState = (0,react__WEBPACK_IMPORTED_MODULE_4__.useState)(true),
-    _useState2 = (0,_babel_runtime_helpers_slicedToArray__WEBPACK_IMPORTED_MODULE_2__["default"])(_useState, 2),
-    loading = _useState2[0],
-    setLoading = _useState2[1];
-  var _useState3 = (0,react__WEBPACK_IMPORTED_MODULE_4__.useState)({
+  var _useState = (0,react__WEBPACK_IMPORTED_MODULE_4__.useState)({
       posts: []
     }),
+    _useState2 = (0,_babel_runtime_helpers_slicedToArray__WEBPACK_IMPORTED_MODULE_2__["default"])(_useState, 2),
+    postData = _useState2[0],
+    setPostData = _useState2[1];
+  var _useState3 = (0,react__WEBPACK_IMPORTED_MODULE_4__.useState)(url),
     _useState4 = (0,_babel_runtime_helpers_slicedToArray__WEBPACK_IMPORTED_MODULE_2__["default"])(_useState3, 2),
-    postData = _useState4[0],
-    setPostData = _useState4[1];
-  var _useState5 = (0,react__WEBPACK_IMPORTED_MODULE_4__.useState)(url),
+    nextUrl = _useState4[0],
+    setNextUrl = _useState4[1]; // Initialize nextUrl with the provided URL
+  var _useState5 = (0,react__WEBPACK_IMPORTED_MODULE_4__.useState)(true),
     _useState6 = (0,_babel_runtime_helpers_slicedToArray__WEBPACK_IMPORTED_MODULE_2__["default"])(_useState5, 2),
-    nextUrl = _useState6[0],
-    setNextUrl = _useState6[1]; // Initialize nextUrl with the provided URL
+    hasMore = _useState6[0],
+    setHasMore = _useState6[1]; // To control when to stop infinite scroll
 
-  // Fetch posts
-  (0,react__WEBPACK_IMPORTED_MODULE_4__.useEffect)(function () {
-    var fetchPosts = /*#__PURE__*/function () {
-      var _ref2 = (0,_babel_runtime_helpers_asyncToGenerator__WEBPACK_IMPORTED_MODULE_1__["default"])(/*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_3___default().mark(function _callee2() {
-        var response, data, detailedPostsPromises, detailedPosts;
-        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_3___default().wrap(function _callee2$(_context2) {
-          while (1) switch (_context2.prev = _context2.next) {
-            case 0:
-              _context2.prev = 0;
-              setLoading(true); // Set loading to true at the start
-              _context2.next = 4;
-              return fetch(nextUrl, {
-                credentials: "same-origin"
-              });
-            case 4:
-              response = _context2.sent;
-              if (response.ok) {
-                _context2.next = 7;
-                break;
-              }
-              throw new Error(response.statusText);
-            case 7:
-              _context2.next = 9;
-              return response.json();
-            case 9:
-              data = _context2.sent;
-              // Array to hold detailed post data
-              detailedPostsPromises = data.results.map(/*#__PURE__*/function () {
-                var _ref3 = (0,_babel_runtime_helpers_asyncToGenerator__WEBPACK_IMPORTED_MODULE_1__["default"])(/*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_3___default().mark(function _callee(result) {
-                  var postResponse, postData;
-                  return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_3___default().wrap(function _callee$(_context) {
-                    while (1) switch (_context.prev = _context.next) {
-                      case 0:
-                        _context.next = 2;
-                        return fetch(result.url, {
-                          credentials: "same-origin"
-                        });
-                      case 2:
-                        postResponse = _context.sent;
-                        if (postResponse.ok) {
-                          _context.next = 5;
-                          break;
-                        }
-                        throw new Error(postResponse.statusText);
-                      case 5:
-                        _context.next = 7;
-                        return postResponse.json();
-                      case 7:
-                        postData = _context.sent;
-                        return _context.abrupt("return", {
-                          imgUrl: postData.imgUrl,
-                          owner: postData.owner,
-                          ownerImgUrl: postData.ownerImgUrl,
-                          comments: postData.comments,
-                          likes: postData.likes,
-                          created: postData.created,
-                          ownerShowUrl: postData.ownerShowUrl,
-                          postShowUrl: postData.postShowUrl,
-                          postId: postData.postid
-                        });
-                      case 9:
-                      case "end":
-                        return _context.stop();
-                    }
-                  }, _callee);
-                }));
-                return function (_x) {
-                  return _ref3.apply(this, arguments);
-                };
-              }()); // Resolve all the promises to get detailed post data
-              _context2.next = 13;
-              return Promise.all(detailedPostsPromises);
-            case 13:
-              detailedPosts = _context2.sent;
-              // Append new detailed posts to the postData
-              setPostData(function (prevPostData) {
-                var existingPostIds = new Set(prevPostData.posts.map(function (post) {
-                  return post.postId;
-                }));
-                var newPosts = detailedPosts.filter(function (post) {
-                  return !existingPostIds.has(post.postId);
-                });
-                return {
-                  posts: [].concat((0,_babel_runtime_helpers_toConsumableArray__WEBPACK_IMPORTED_MODULE_0__["default"])(prevPostData.posts), (0,_babel_runtime_helpers_toConsumableArray__WEBPACK_IMPORTED_MODULE_0__["default"])(newPosts)) // Append only unique new posts
-                };
-              });
-
-              // Update nextUrl state
-              setNextUrl(data.next); // Set nextUrl for pagination
-              setLoading(false); // Set loading to false after fetching
-              _context2.next = 23;
+  // Fetch posts function
+  var fetchPosts = /*#__PURE__*/function () {
+    var _ref2 = (0,_babel_runtime_helpers_asyncToGenerator__WEBPACK_IMPORTED_MODULE_1__["default"])(/*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_3___default().mark(function _callee2() {
+      var response, data, detailedPostsPromises, detailedPosts;
+      return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_3___default().wrap(function _callee2$(_context2) {
+        while (1) switch (_context2.prev = _context2.next) {
+          case 0:
+            if (nextUrl) {
+              _context2.next = 2;
               break;
-            case 19:
-              _context2.prev = 19;
-              _context2.t0 = _context2["catch"](0);
-              console.error("Error fetching posts:", _context2.t0);
-              setLoading(false); // Ensure loading is set to false on error
-            case 23:
-            case "end":
-              return _context2.stop();
-          }
-        }, _callee2, null, [[0, 19]]);
-      }));
-      return function fetchPosts() {
-        return _ref2.apply(this, arguments);
-      };
-    }();
+            }
+            return _context2.abrupt("return");
+          case 2:
+            _context2.prev = 2;
+            _context2.next = 5;
+            return fetch(nextUrl, {
+              credentials: "same-origin"
+            });
+          case 5:
+            response = _context2.sent;
+            if (response.ok) {
+              _context2.next = 8;
+              break;
+            }
+            throw new Error(response.statusText);
+          case 8:
+            _context2.next = 10;
+            return response.json();
+          case 10:
+            data = _context2.sent;
+            // Array to hold detailed post data
+            detailedPostsPromises = data.results.map(/*#__PURE__*/function () {
+              var _ref3 = (0,_babel_runtime_helpers_asyncToGenerator__WEBPACK_IMPORTED_MODULE_1__["default"])(/*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_3___default().mark(function _callee(result) {
+                var postResponse, postData;
+                return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_3___default().wrap(function _callee$(_context) {
+                  while (1) switch (_context.prev = _context.next) {
+                    case 0:
+                      _context.next = 2;
+                      return fetch(result.url, {
+                        credentials: "same-origin"
+                      });
+                    case 2:
+                      postResponse = _context.sent;
+                      if (postResponse.ok) {
+                        _context.next = 5;
+                        break;
+                      }
+                      throw new Error(postResponse.statusText);
+                    case 5:
+                      _context.next = 7;
+                      return postResponse.json();
+                    case 7:
+                      postData = _context.sent;
+                      return _context.abrupt("return", {
+                        imgUrl: postData.imgUrl,
+                        owner: postData.owner,
+                        ownerImgUrl: postData.ownerImgUrl,
+                        comments: postData.comments,
+                        likes: postData.likes,
+                        created: postData.created,
+                        ownerShowUrl: postData.ownerShowUrl,
+                        postShowUrl: postData.postShowUrl,
+                        postId: postData.postid
+                      });
+                    case 9:
+                    case "end":
+                      return _context.stop();
+                  }
+                }, _callee);
+              }));
+              return function (_x) {
+                return _ref3.apply(this, arguments);
+              };
+            }()); // Resolve all the promises to get detailed post data
+            _context2.next = 14;
+            return Promise.all(detailedPostsPromises);
+          case 14:
+            detailedPosts = _context2.sent;
+            // Append new detailed posts to the postData
+            setPostData(function (prevPostData) {
+              var existingPostIds = new Set(prevPostData.posts.map(function (post) {
+                return post.postId;
+              }));
+              var newPosts = detailedPosts.filter(function (post) {
+                return !existingPostIds.has(post.postId);
+              });
+              return {
+                posts: [].concat((0,_babel_runtime_helpers_toConsumableArray__WEBPACK_IMPORTED_MODULE_0__["default"])(prevPostData.posts), (0,_babel_runtime_helpers_toConsumableArray__WEBPACK_IMPORTED_MODULE_0__["default"])(newPosts)) // Append only unique new posts
+              };
+            });
 
-    // Only fetch posts if nextUrl is defined
-    if (nextUrl) {
-      fetchPosts();
-    }
-  }, [nextUrl]); // Dependency on nextUrl
+            // Update nextUrl state for pagination
+            if (data.next) {
+              setNextUrl(data.next);
+            } else {
+              setHasMore(false); // If there's no next URL, stop infinite scroll
+            }
+            _context2.next = 22;
+            break;
+          case 19:
+            _context2.prev = 19;
+            _context2.t0 = _context2["catch"](2);
+            console.error("Error fetching posts:", _context2.t0);
+          case 22:
+          case "end":
+            return _context2.stop();
+        }
+      }, _callee2, null, [[2, 19]]);
+    }));
+    return function fetchPosts() {
+      return _ref2.apply(this, arguments);
+    };
+  }();
+
+  // Fetch posts when the component mounts (initial load)
+  (0,react__WEBPACK_IMPORTED_MODULE_4__.useEffect)(function () {
+    fetchPosts(); // Call fetchPosts once when the component mounts
+  }, []); // Empty dependency array ensures this runs only once
 
   // Resetting scroll position when component mounts
   (0,react__WEBPACK_IMPORTED_MODULE_4__.useEffect)(function () {
@@ -730,25 +740,21 @@ function Post(_ref) {
   }, []);
   return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_4___default().createElement("div", {
     className: "post"
-  }, loading ? /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_4___default().createElement("p", null, "Loading...") // Show loading message until data arrives
-  : /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_4___default().createElement(react_infinite_scroll_component__WEBPACK_IMPORTED_MODULE_8__["default"], {
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_4___default().createElement(react_infinite_scroll_component__WEBPACK_IMPORTED_MODULE_8__["default"], {
     dataLength: postData.posts.length // Length of currently loaded posts
     ,
-    next: nextUrl // Function to load more
+    next: fetchPosts // Function to load more when scrolling
     ,
-    hasMore: !!nextUrl // Whether there's more to load
+    hasMore: hasMore // Whether there's more to load
     ,
     loader: /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_4___default().createElement("h4", null, "Loading more posts...") // Loading indicator
     ,
-    endMessage: /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_4___default().createElement("p", null, "No more posts to display.") // End message
-  }, postData.posts.map(function (post) {
+    endMessage: /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_4___default().createElement("p", null, "No more posts to display.") // End message when no more posts
+  }, (0,_babel_runtime_helpers_toConsumableArray__WEBPACK_IMPORTED_MODULE_0__["default"])(postData.posts).map(function (post) {
     return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_4___default().createElement("div", {
       key: post.postId,
       className: "additional-posts"
-    }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_4___default().createElement("img", {
-      src: post.imgUrl,
-      alt: "post_image"
-    }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_4___default().createElement("a", {
+    }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_4___default().createElement("a", {
       href: post.ownerShowUrl
     }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_4___default().createElement("img", {
       src: post.ownerImgUrl,
@@ -758,13 +764,10 @@ function Post(_ref) {
       href: post.ownerShowUrl
     }, post.owner), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_4___default().createElement("p", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_4___default().createElement("a", {
       href: post.postShowUrl
-    }, dayjs__WEBPACK_IMPORTED_MODULE_5___default().utc(post.created).local().fromNow())), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_4___default().createElement("img", {
-      src: post.postShowUrl,
-      alt: "Post ".concat(post.postId),
-      className: "post-pic"
-    }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_4___default().createElement(_likes__WEBPACK_IMPORTED_MODULE_9__["default"], {
+    }, dayjs__WEBPACK_IMPORTED_MODULE_5___default().utc(post.created).local().fromNow())), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_4___default().createElement(_likes__WEBPACK_IMPORTED_MODULE_9__["default"], {
       postid: post.postId,
-      initialLikes: post.likes
+      initialLikes: post.likes,
+      postURL: post.imgUrl
     }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_4___default().createElement(_comments__WEBPACK_IMPORTED_MODULE_10__["default"], {
       postid: post.postId,
       initialComments: post.comments

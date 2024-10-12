@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import PropTypes from "prop-types";
 
-export default function Likes({ postid, initialLikes }) {
+export default function Likes({ postid, initialLikes, postURL }) {
   const [likes, setLikes] = useState(initialLikes);
 
   useEffect(() => {
@@ -50,13 +50,19 @@ export default function Likes({ postid, initialLikes }) {
   };
 
   return (
-    <div onDoubleClick={handleDoubleClick}>
+    <div>
+      <img 
+      src={postURL} // Replace with the actual image URL
+      alt="Post"
+      onDoubleClick={handleDoubleClick} // Handle double-click for likes
+      style={{ cursor: 'pointer' }} // Optional: change cursor to pointer for better UX
+      />
       <button 
         data-testid="like-unlike-button"
         onClick={likes.lognameLikesThis ? handleUnlike : handleLike}>
         {likes.lognameLikesThis ? 'Unlike' : 'Like'}
       </button>
-      <p>{likes.numLikes} {likes.numLikes === 1 ? 'Like' : 'Likes'}</p>
+      <p>{likes.numLikes} {likes.numLikes === 1 ? 'like' : 'likes'}</p>
     </div>
   );
 }

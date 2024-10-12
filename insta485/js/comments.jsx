@@ -1,13 +1,9 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import PropTypes from "prop-types";
 
 export default function Comments({ postid, initialComments }) {
   const [comments, setComments] = useState(initialComments);
   const [newCommentText, setNewCommentText] = useState("");
-
-  useEffect(() => {
-    setComments(initialComments);
-  }, [initialComments]);
 
   const handleDelete = (commentid) => {
     const deleteCommentUrl = `/api/v1/comments/${commentid}`;
