@@ -22,21 +22,26 @@ def add_comment():
     if not postid:
         return flask.jsonify({"error": "postid and text are required"}), 404
 
-    # Insert the comment into the database
-    connection.execute('INSERT INTO comments (postid, text, owner) VALUES (?, ?, ?)',
-                   (postid, text, username))  
-    cursor=connection.cursor()
-    comment_id = cursor.lastrowid
-    connection.commit()
+    try:
+        # Insert the comment into the database
+        cursor = connection.cursor()  # Get the cursor before executing the insert
+        cursor.execute('INSERT INTO comments (postid, text, owner) VALUES (?, ?, ?)', (postid, text, username))
+        
+        comment_id = cursor.lastrowid  # Retrieve last inserted comment ID
+        connection.commit()  # Commit the transaction
 
-    return flask.jsonify({
-        "commentid": comment_id,
-        "lognameOwnsThis": True,
-        "owner": username,
-        "ownerShowUrl": f"/users/{username}/",
-        "text": text,
-        "url": f"/api/v1/comments/{comment_id}/"
-    }), 201
+        return flask.jsonify({
+            "commentid": comment_id,
+            "lognameOwnsThis": True,
+            "owner": username,
+            "ownerShowUrl": f"/users/{username}/",
+            "text": text,
+            "url": f"/api/v1/comments/{comment_id}/"
+        }), 201
+    except Exception as e:
+        print("An error occurred:", e)  # Log the error for debugging
+        return flask.jsonify({"error": "An error occurred while adding the comment."}), 500  # Internal server error
+    
 
 @insta485.app.route('/api/v1/comments/<int:commentid>/', methods=['DELETE'])
 def delete_comment(commentid):
