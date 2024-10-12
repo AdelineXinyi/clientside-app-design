@@ -23,7 +23,7 @@ def get_post(postid_url_slug):
     if not username:
         auth = flask.request.authorization
         if insta485.model.hash_pass() is False:
-            insta485.model.helper_auth()
+            return insta485.model.helper_auth()
         username = auth['username']
     connection = insta485.model.get_db()
     post = connection.execute(
@@ -108,7 +108,7 @@ def get_posts():
     if not username:
         auth = flask.request.authorization
         if insta485.model.hash_pass() is False:
-            insta485.model.helper_auth()
+            return insta485.model.helper_auth()
         username = auth['username']
     followed_users = connection.execute(
         "SELECT username2 FROM following WHERE username1 = ?",

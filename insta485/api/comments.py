@@ -13,7 +13,7 @@ def add_comment():
     if not username1:
         auth = flask.request.authorization
         if insta485.model.hash_pass() is False:
-            insta485.model.helper_auth()
+            return insta485.model.helper_auth()
         username1 = auth['username']
 
     postid = flask.request.args.get('postid')
@@ -57,7 +57,7 @@ def delete_comment(commentid):
     if not username1:
         auth = flask.request.authorization
         if insta485.model.hash_pass() is False:
-            insta485.model.helper_auth()
+            return insta485.model.helper_auth()
         username1 = auth['username']
 
     comment = connection.execute(

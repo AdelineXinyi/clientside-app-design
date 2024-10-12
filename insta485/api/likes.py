@@ -12,7 +12,7 @@ def add_like():
     if not username2:
         auth = flask.request.authorization
         if insta485.model.hash_pass() is False:
-            insta485.model.helper_auth()
+            return insta485.model.helper_auth()
         username2 = auth['username']
     pid = flask.request.args.get("postid")
     post = connection.execute(
@@ -51,7 +51,7 @@ def delete_like(likeid):
     if not username3:
         auth1 = flask.request.authorization
         if insta485.model.hash_pass() is not True:
-            insta485.model.helper_auth()
+            return insta485.model.helper_auth()
         username3 = auth1['username']
     like = connection.execute(
         "SELECT owner FROM likes WHERE likeid = ?",

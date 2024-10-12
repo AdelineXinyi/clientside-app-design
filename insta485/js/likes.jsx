@@ -10,35 +10,35 @@ export default function Likes({ postid, initialLikes, postURL }) {
 
   const handleLike = () => {
     const makeLikeUrl = `/api/v1/likes/?postid=${postid}`;
-    fetch(makeLikeUrl, { credentials: 'same-origin', method: 'POST' })
+    fetch(makeLikeUrl, { credentials: "same-origin", method: "POST" })
       .then((response) => {
         if (!response.ok) throw Error(response.statusText);
         return response.json();
       })
       .then((data) => {
-          setLikes((prevLikes) => ({
-            ...prevLikes,
-            numLikes: prevLikes.numLikes + 1,
-            lognameLikesThis: true,
-            url: data.url,
-          }));
+        setLikes((prevLikes) => ({
+          ...prevLikes,
+          numLikes: prevLikes.numLikes + 1,
+          lognameLikesThis: true,
+          url: data.url,
+        }));
       })
       .catch((error) => console.log(error));
   };
 
   const handleUnlike = () => {
     const deleteLikeUrl = likes.url;
-    fetch(deleteLikeUrl, { credentials: 'same-origin', method: 'DELETE' })
+    fetch(deleteLikeUrl, { credentials: "same-origin", method: "DELETE" })
       .then((response) => {
         if (!response.ok) throw Error(response.statusText);
       })
       .then(() => {
-          setLikes((prevLikes) => ({
-            ...prevLikes,
-            numLikes: prevLikes.numLikes - 1,
-            lognameLikesThis: false,
-            url: null,
-          }));
+        setLikes((prevLikes) => ({
+          ...prevLikes,
+          numLikes: prevLikes.numLikes - 1,
+          lognameLikesThis: false,
+          url: null,
+        }));
       })
       .catch((error) => console.log(error));
   };
@@ -51,18 +51,22 @@ export default function Likes({ postid, initialLikes, postURL }) {
 
   return (
     <div>
-      <img 
-      src={postURL} // Replace with the actual image URL
-      alt="Post"
-      onDoubleClick={handleDoubleClick} // Handle double-click for likes
-      style={{ cursor: 'pointer' }} // Optional: change cursor to pointer for better UX
+      <img
+        src={postURL} // Replace with the actual image URL
+        alt="Post"
+        onDoubleClick={handleDoubleClick} // Handle double-click for likes
+        style={{ cursor: "pointer" }} // Optional: change cursor to pointer for better UX
       />
-      <button type="button"
+      <button
+        type="button"
         data-testid="like-unlike-button"
-        onClick={likes.lognameLikesThis ? handleUnlike : handleLike}>
-        {likes.lognameLikesThis ? 'Unlike' : 'Like'}
+        onClick={likes.lognameLikesThis ? handleUnlike : handleLike}
+      >
+        {likes.lognameLikesThis ? "Unlike" : "Like"}
       </button>
-      <p>{likes.numLikes} {likes.numLikes === 1 ? 'like' : 'likes'}</p>
+      <p>
+        {likes.numLikes} {likes.numLikes === 1 ? "like" : "likes"}
+      </p>
     </div>
   );
 }
