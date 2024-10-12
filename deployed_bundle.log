@@ -1,0 +1,24 @@
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0*   Trying 3.23.88.149:80...
+* Connected to ec2-3-23-88-149.us-east-2.compute.amazonaws.com (3.23.88.149) port 80 (#0)
+> GET /static/js/bundle.js HTTP/1.1
+> Host: ec2-3-23-88-149.us-east-2.compute.amazonaws.com
+> User-Agent: curl/8.1.2
+> Accept: */*
+> Cookie: login=eyJ1c2VybmFtZSI6ImF3ZGVvcmlvIn0.ZwrXhQ.jCcwI3qrjGS4hUtTIZm2fvSA5VI
+> 
+< HTTP/1.1 200 OK
+< Server: nginx/1.24.0 (Ubuntu)
+< Date: Sat, 12 Oct 2024 20:11:39 GMT
+< Content-Type: text/javascript; charset=utf-8
+< Content-Length: 721675
+< Connection: keep-alive
+< Content-Disposition: inline; filename=bundle.js
+< Last-Modified: Sat, 12 Oct 2024 20:02:18 GMT
+< Cache-Control: no-cache
+< ETag: "1728763338.4202104-721675-3954186017"
+< 
+{ [1101 bytes data]
+100  704k  100  704k    0     0  2814k      0 --:--:-- --:--:-- --:--:-- 2876k
+* Connection #0 to host ec2-3-23-88-149.us-east-2.compute.amazonaws.com left intact
