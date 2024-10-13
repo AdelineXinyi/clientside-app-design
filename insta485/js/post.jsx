@@ -59,9 +59,8 @@ export default function Post({ url }) {
           // Wait for all post details to be fetched
           Promise.all(detailedPostsPromises).then((detailedPosts) => {
             setPostData({ posts: detailedPosts });
-            if (data.next) {
-              setNextUrl(data.next);
-            } else {
+            setNextUrl(data.next);
+            if (!data.next) {
               setHasMore(false);
             }
           });
@@ -86,7 +85,7 @@ export default function Post({ url }) {
   const fetchPosts = () => {
     if (!nextUrl) return;
     setLoading(true);
-    fetch(url, { credentials: "same-origin", method: "GET" })
+    fetch(nextUrl, { credentials: "same-origin", method: "GET" })
       .then((response) => {
         if (!response.ok) {
           throw Error(response.statusText);
@@ -117,10 +116,19 @@ export default function Post({ url }) {
         );
         // Wait for all post details to be fetched
         Promise.all(detailedPostsPromises).then((detailedPosts) => {
-          setPostData({ posts: detailedPosts });
-          if (data.next) {
-            setNextUrl(data.next);
-          } else {
+          setPostData((prevPostData) => {
+            const existingPostIds = new Set(
+              prevPostData.posts.map((post) => post.postId),
+            );
+            const newPosts = detailedPosts.filter(
+              (post) => !existingPostIds.has(post.postId),
+            );
+            return {
+              posts: [...prevPostData.posts, ...newPosts],
+            };
+          });
+          setNextUrl(data.next);
+          if (!data.next) {
             setHasMore(false);
           }
         });
@@ -138,7 +146,7 @@ export default function Post({ url }) {
   }, []);
 
   const isLiked = async (postId) => {
-    postData.posts.map((post) => {
+    postData.posts.forEach((post) => {
       if (post.postId === postId) {
         if (!post.likes.lognameLikesThis) {
           // If not liked, like post
@@ -198,12 +206,12 @@ export default function Post({ url }) {
             .catch((error) => console.error("Error unliking post:", error));
         }
       }
-      return post;
     });
   };
 
   return (
     <div className="post">
+      {loading ? <p>Loading...</p> : null}
       <InfiniteScroll
         dataLength={postData.posts.length}
         next={fetchPosts}
@@ -226,20 +234,13 @@ export default function Post({ url }) {
                 {dayjs.utc(post.created).local().fromNow()}
               </a>
             </p>
-            {!loading && (
-              <>
-                <Likes
-                  toggle={() => isLiked(post.postId)}
-                  numLikes={post.likes.numLikes}
-                  postURL={post.imgUrl}
-                  isLiked={post.isActive}
-                />
-                <Comments
-                  postid={post.postId}
-                  initialComments={post.comments}
-                />
-              </>
-            )}
+            <Likes
+              toggle={() => isLiked(post.postId)}
+              numLikes={post.likes.numLikes}
+              postURL={post.imgUrl}
+              isLiked={post.isActive}
+            />
+            <Comments postid={post.postId} initialComments={post.comments} />
           </div>
         ))}
       </InfiniteScroll>
