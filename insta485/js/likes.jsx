@@ -1,82 +1,28 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import PropTypes from "prop-types";
 
-export default function Likes({ postid, initialLikes, postURL }) {
-  const [likes, setLikes] = useState(initialLikes);
-
-  useEffect(() => {
-    setLikes(initialLikes);
-  }, [initialLikes]);
-
-  const handleLike = () => {
-    const makeLikeUrl = `/api/v1/likes/?postid=${postid}`;
-    fetch(makeLikeUrl, { credentials: "same-origin", method: "POST" })
-      .then((response) => {
-        if (!response.ok) throw new Error(response.statusText);
-        return response.json();
-      })
-      .then((data) => {
-        setLikes((prevLikes) => ({
-          ...prevLikes,
-          numLikes: prevLikes.numLikes + 1,
-          lognameLikesThis: true,
-          url: data.url,
-        }));
-      })
-      .catch((error) => console.error("Error liking post:", error));
-  };
-
-  const handleUnlike = () => {
-    const deleteLikeUrl = likes.url;
-    fetch(deleteLikeUrl, { credentials: "same-origin", method: "DELETE" })
-      .then((response) => {
-        if (!response.ok) throw new Error(response.statusText);
-      })
-      .then(() => {
-        setLikes((prevLikes) => ({
-          ...prevLikes,
-          numLikes: prevLikes.numLikes - 1,
-          lognameLikesThis: false,
-          url: null,
-        }));
-      })
-      .catch((error) => console.error("Error unliking post:", error));
-  };
-
-  const handleDoubleClick = () => {
-    if (!likes.lognameLikesThis) {
-      handleLike();
-    }
-  };
-
+export default function Likes({ numLikes, isLiked, postURL, toggle }) {
   return (
     <div>
       <img
         src={postURL}
         alt="Post"
-        onDoubleClick={handleDoubleClick}
+        onDoubleClick={toggle}
         style={{ cursor: "pointer" }}
       />
-      <button
-        type="button"
-        data-testid="like-unlike-button"
-        onClick={likes.lognameLikesThis ? handleUnlike : handleLike}
-      >
-        {likes.lognameLikesThis ? "Unlike" : "Like"}
+      <button type="button" data-testid="like-unlike-button" onClick={toggle}>
+        {isLiked ? "Unlike" : "Like"}
       </button>
       <p>
-        {likes.numLikes} {likes.numLikes === 1 ? "like" : "likes"}
+        {numLikes} {numLikes === 1 ? "like" : "likes"}
       </p>
     </div>
   );
 }
 
 Likes.propTypes = {
-  postid: PropTypes.number.isRequired,
-  initialLikes: PropTypes.shape({
-    numLikes: PropTypes.number.isRequired,
-    lognameLikesThis: PropTypes.bool.isRequired,
-    url: PropTypes.string,
-  }).isRequired,
+  numLikes: PropTypes.number.isRequired,
   postURL: PropTypes.string.isRequired,
+  toggle: PropTypes.func.isRequired,
+  isLiked: PropTypes.bool.isRequired,
 };

@@ -16,10 +16,11 @@ export default function Post({ url }) {
   });
   const [nextUrl, setNextUrl] = useState(url);
   const [hasMore, setHasMore] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   const fetchPosts = useCallback(async () => {
     if (!nextUrl) return;
-
+    setLoading(true);
     try {
       const response = await fetch(nextUrl, { credentials: "same-origin" });
       if (!response.ok) throw new Error(response.statusText);
@@ -31,7 +32,6 @@ export default function Post({ url }) {
         });
         if (!postResponse.ok) throw new Error(postResponse.statusText);
         const postDetail = await postResponse.json();
-
         return {
           imgUrl: postDetail.imgUrl,
           owner: postDetail.owner,
@@ -42,6 +42,7 @@ export default function Post({ url }) {
           ownerShowUrl: postDetail.ownerShowUrl,
           postShowUrl: postDetail.postShowUrl,
           postId: postDetail.postid,
+          isActive: postDetail.likes.lognameLikesThis,
         };
       });
 
@@ -67,6 +68,8 @@ export default function Post({ url }) {
       }
     } catch (error) {
       console.error("Error fetching posts:", error);
+    } finally {
+      setLoading(false);
     }
   }, [nextUrl]);
 
@@ -78,6 +81,69 @@ export default function Post({ url }) {
     window.scrollTo(0, 0);
   }, []);
 
+  const isLiked = async (postId) => {
+    postData.posts.map((post) => {
+      if (post.postId === postId) {
+        if (!post.likes.lognameLikesThis) {
+          // If not liked, like post
+          const makeLikeUrl = `/api/v1/likes/?postid=${postId}`;
+          fetch(makeLikeUrl, { credentials: "same-origin", method: "POST" })
+            .then((response) => {
+              if (!response.ok) throw new Error(response.statusText);
+              return response.json();
+            })
+            .then((data) => {
+              setPostData((prevData) => {
+                const newPosts = prevData.posts.map((p) => {
+                  if (p.postId === postId) {
+                    return {
+                      ...p,
+                      likes: {
+                        ...p.likes,
+                        numLikes: p.likes.numLikes + 1,
+                        lognameLikesThis: true,
+                        url: data.url,
+                      },
+                    };
+                  }
+                  return p;
+                });
+                return { ...prevData, posts: newPosts };
+              });
+            })
+            .catch((error) => console.error("Error liking post:", error));
+        } else {
+          // If liked, unlike post
+          const deleteLikeUrl = post.likes.url;
+          fetch(deleteLikeUrl, { credentials: "same-origin", method: "DELETE" })
+            .then((response) => {
+              if (!response.ok) throw new Error(response.statusText);
+              // Only update state after successful deletion
+              setPostData((prevData) => {
+                const newPosts = prevData.posts.map((p) => {
+                  if (p.postId === postId) {
+                    return {
+                      ...p,
+                      likes: {
+                        ...p.likes,
+                        numLikes: p.likes.numLikes - 1,
+                        lognameLikesThis: false,
+                        url: null,
+                      },
+                    };
+                  }
+                  return p;
+                });
+                return { ...prevData, posts: newPosts };
+              });
+            })
+            .catch((error) => console.error("Error unliking post:", error));
+        }
+      }
+      return post;
+    });
+  };
+
   return (
     <div className="post">
       <InfiniteScroll
@@ -87,7 +153,7 @@ export default function Post({ url }) {
         loader={<h4>Loading more posts...</h4>}
         endMessage={<p>No more posts to display.</p>}
       >
-        {[...postData.posts].map((post) => (
+        {postData.posts.map((post) => (
           <div key={post.postId} className="additional-posts">
             <a href={post.ownerShowUrl}>
               <img
@@ -102,14 +168,23 @@ export default function Post({ url }) {
                 {dayjs.utc(post.created).local().fromNow()}
               </a>
             </p>
-            <Likes
-              postid={post.postId}
-              initialLikes={post.likes}
-              postURL={post.imgUrl}
-            />
-            <Comments postid={post.postId} initialComments={post.comments} />
+            {!loading && (
+              <>
+                <Likes
+                  toggle={() => isLiked(post.postId)}
+                  numLikes={post.likes.numLikes}
+                  postURL={post.imgUrl}
+                  isLiked={post.isActive}
+                />
+                <Comments
+                  postid={post.postId}
+                  initialComments={post.comments}
+                />
+              </>
+            )}
           </div>
         ))}
+        ;
       </InfiniteScroll>
     </div>
   );
