@@ -2,12 +2,19 @@ import React from "react";
 import PropTypes from "prop-types";
 
 export default function Likes({ numLikes, isLiked, postURL, toggle }) {
+  const handleDoubleClick = () => {
+    if (!isLiked) {
+      return toggle();
+    }
+    return undefined;
+  };
+
   return (
     <div>
       <img
         src={postURL}
         alt="Post"
-        onDoubleClick={toggle}
+        onDoubleClick={handleDoubleClick}
         style={{ cursor: "pointer" }}
       />
       <button type="button" data-testid="like-unlike-button" onClick={toggle}>

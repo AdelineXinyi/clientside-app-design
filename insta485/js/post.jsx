@@ -104,6 +104,7 @@ export default function Post({ url }) {
                         lognameLikesThis: true,
                         url: data.url,
                       },
+                      isActive: true,
                     };
                   }
                   return p;
@@ -130,6 +131,7 @@ export default function Post({ url }) {
                         lognameLikesThis: false,
                         url: null,
                       },
+                      isActive: false,
                     };
                   }
                   return p;
