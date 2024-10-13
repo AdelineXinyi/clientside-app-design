@@ -133,6 +133,10 @@ export default function Post({ url }) {
       });
   };
 
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
   const isLiked = async (postId) => {
     postData.posts.map((post) => {
       if (post.postId === postId) {
